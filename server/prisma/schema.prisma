@@ -9,3 +9,68 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+model User {
+  id            String    @id @default(uuid())
+  email         String    @unique
+  emailVerified Boolean   @default(false)
+  Account       Account[]
+
+  createdAt DateTime @default(now())
+  profile   Profile?
+
+  @@map("users")
+}
+
+model Account {
+  id         String        @id @default(uuid())
+  providerId String
+  provider   OauthProvider
+  userId     String
+  user       User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerId])
+  @@map("accounts")
+}
+
+enum OauthProvider {
+  Google
+  Facebook
+}
+
+model Profile {
+  id          String   @id @default(uuid())
+  name        String
+  dateOfBirth DateTime
+  gender      Gender
+  images      String[]
+  languages   String[]
+  bio         String
+  basicInfo   String[]
+  interests   String[]
+  lifestyle   String[]
+  socials     String[]
+  lookingFor  String
+  userId      String   @unique
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("profiles")
+}
+
+enum Gender {
+  Male
+  Female
+  Other
+}
+
+model Conversation {
+  id String @id @default(uuid())
+
+  @@map("conversations")
+}
+
+model Message {
+  id String @id @default(uuid())
+
+  @@map("messages")
+}
