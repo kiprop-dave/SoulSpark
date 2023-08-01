@@ -6,6 +6,8 @@ const envSchema = object({
   REDIS_URL: string().url(),
   ACCESS_TOKEN_SECRET: string(),
   REFRESH_TOKEN_SECRET: string(),
+  GOOGLE_CLIENT_SECRET: string(),
+  GOOGLE_CLIENT_ID: string()
 });
 
 export const env = envSchema.parse(process.env);

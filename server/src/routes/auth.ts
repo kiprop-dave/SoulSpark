@@ -1,6 +1,7 @@
 import { Router } from "express";
-import { getSession, createSession } from "../utils/session";
+import { getSession } from "../utils/session";
 import { generateAccessToken } from "../utils/webToken";
+import { checkUserProfile } from "../controllers/users";
 const authRouter = Router();
 
 
@@ -9,12 +10,16 @@ const authRouter = Router();
 authRouter.route('/me').get(async (req, res) => {
   const session = await getSession(req);
   if (!session) return res.status(401).send({ message: "You are not logged in." });
+
   const accessToken = generateAccessToken(session.id, "15m");
-  res.status(200).json({
+  const filledProfile = await checkUserProfile(session.id);
+
+  return res.status(200).json({
     id: session.id,
     email: session.email,
+    filledProfile: filledProfile,
     accessToken,
-  })
+  });
 });
 
 
