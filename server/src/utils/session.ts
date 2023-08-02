@@ -23,7 +23,6 @@ export async function createSession(res: Response, user: UserSessionData) {
     };
     await redis.set(`session:${user.id}`, JSON.stringify(sessionData), { EX: 60 * 60 * 24 * 7 });
     res.cookie("refreshToken", refreshToken, { sameSite: "strict", maxAge: 1000 * 60 * 60 * 24 * 7, httpOnly: true });
-    console.log("Session created");
   } catch (err) {
     console.log(err);
     throw new Error("Error creating session");

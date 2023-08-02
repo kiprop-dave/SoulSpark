@@ -40,7 +40,8 @@ enum OauthProvider {
 
 model Profile {
   id          String   @id @default(uuid())
-  name        String
+  first_name  String   @db.VarChar(50)
+  last_name   String   @db.VarChar(50)
   dateOfBirth DateTime
   gender      Gender
   images      String[]
