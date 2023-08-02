@@ -1,6 +1,6 @@
 import { createContext, useEffect, useState, useContext } from "react";
 import { LoggedInUser } from "@/types";
-
+import { getLoggedInUser } from "@/api/user";
 
 type AuthContextType = {
   user: LoggedInUser | null;
@@ -12,8 +12,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<LoggedInUser | null>(null);
 
   useEffect(() => {
-
+    getLoggedInUser()
+      .then((user) => setUser(user));
   }, []);
+
+  // console.log(user);
 
   const contextValue = {
     user,

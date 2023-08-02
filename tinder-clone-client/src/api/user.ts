@@ -3,7 +3,7 @@ import { loggedInUserSchema, LoggedInUser } from "@/types";
 
 export const getLoggedInUser = async (): Promise<LoggedInUser | null> => {
   try {
-    const { data } = await api.get('/me');
+    const { data } = await api.get('auth/me');
     const user = loggedInUserSchema.parse(data);
     return user;
   } catch (err) {

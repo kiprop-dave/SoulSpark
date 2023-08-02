@@ -1,5 +1,7 @@
 import { Outlet, RouterProvider, RootRoute, Route, Router } from '@tanstack/router';
 import LoginPage from './pages/Login/page';
+import FillProfilePage from './pages/FillProfile/page';
+import { AuthProvider } from './context/AuthContext';
 
 const rootRoute = new RootRoute({
   component: () => {
@@ -17,6 +19,12 @@ const loginRoute = new Route({
   component: LoginPage
 });
 
+const fillProfileRoute = new Route({
+  getParentRoute: () => rootRoute,
+  path: '/fill-profile',
+  component: FillProfilePage
+});
+
 const catchAllRoute = new Route({
   getParentRoute: () => rootRoute,
   path: '*',
@@ -25,6 +33,7 @@ const catchAllRoute = new Route({
 
 const routeTree = rootRoute.addChildren([
   loginRoute,
+  fillProfileRoute,
   catchAllRoute
 ]);
 
@@ -40,7 +49,9 @@ function App() {
 
   return (
     <>
-      <RouterProvider router={router} />
+      <AuthProvider>
+        <RouterProvider router={router} />
+      </AuthProvider>
     </>
   )
 }
