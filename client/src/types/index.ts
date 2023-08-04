@@ -21,12 +21,12 @@ export type PersonalInfo = z.infer<typeof personalInfoSchema>;
 export type PersonalInfoNoImages = Omit<PersonalInfo, 'images'>;
 
 export const basicInfoSchema = z.object({
-  bio: z.string().optional(),
+  bio: z.string().max(500).optional(),
   languages: z.array(z.string()).optional(),
   zodiac: z.string().optional(),
   education: z.string().optional(),
   occupation: z.string().optional(),
-}).optional();
+});
 
 export type BasicInfo = z.infer<typeof basicInfoSchema>;
 
@@ -58,7 +58,7 @@ export type Preferences = z.infer<typeof preferencesSchema>;
 
 export const userProfileSchema = z.object({
   personalInfo: personalInfoSchema,
-  basicInfo: basicInfoSchema,
+  basicInfo: basicInfoSchema.optional(),
   otherInfo: otherInfoSchema,
   preferences: preferencesSchema,
 });

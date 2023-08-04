@@ -23,7 +23,7 @@ export default function FillProfilePage() {
       case "personal":
         return <PersonalDetailsTab nextStep={nextTab} setImages={setImages} setPersonalDetails={setPersonalDetails} profileDetails={profileDetails} />;
       case "basic":
-        return <BasicDetailsTab prevStep={prevTab} nextStep={nextTab} />;
+        return <BasicDetailsTab prevStep={prevTab} nextStep={nextTab} confirmStep={setBasicDetails} />;
       case "other":
         return <OtherDetailsTab prevStep={prevTab} nextStep={nextTab} />;
       case "preferences":
@@ -34,7 +34,7 @@ export default function FillProfilePage() {
   }
 
   return (
-    <div className="flex flex-col items-center w-full h-full sm:w-[30%] sm:h-[95%] bg-slate-50 rounded shadow shadow-gray-300">
+    <div className="flex flex-col items-center p-4 w-full h-full sm:w-[50%] sm:h-[95%] md:w-[30%] bg-slate-50 rounded shadow shadow-gray-300 overflow-y-scroll no-scrollbar">
       {whichTab()}
     </div>
   )
