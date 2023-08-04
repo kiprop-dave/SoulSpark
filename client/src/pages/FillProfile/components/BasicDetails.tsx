@@ -1,9 +1,9 @@
 import { useMemo, useState } from 'react';
 import { ZodError } from 'zod';
-import { IoChevronBack } from 'react-icons/io5';
 import { Button } from '@/components/ui/button';
 import { BasicInfo, basicInfoSchema } from '@/types';
 import OptionSelect from '@/components/OptionSelect';
+import ProfileNavigation from '@/components/ProfileNavigation';
 
 interface BasicDetailsTabProps {
   nextStep: () => void;
@@ -101,18 +101,7 @@ export default function BasicDetailsTab({
 
   return (
     <div className="w-full">
-      <div className="w-full flex items-center justify-between">
-        <button
-          onClick={() => prevStep()}
-          type="button"
-          className="flex items-center justify-center w-[40px] h-[40px] rounded-sm border border-slate-300"
-        >
-          <IoChevronBack className="w-6 h-6 text-red-500" />
-        </button>
-        <button onClick={() => nextStep()} className="text-red-500 font-bold" type="button">
-          Skip
-        </button>
-      </div>
+      <ProfileNavigation prevStep={prevStep} nextStep={nextStep} />
       <h1 className="text-2xl font-bold text-black mt-4">Fill in some basic details</h1>
       <form onSubmit={(e) => handleSubmit(e)}>
         <div className="flex flex-col items-start justify-start w-full mt-4">

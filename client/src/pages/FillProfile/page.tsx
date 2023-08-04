@@ -23,6 +23,8 @@ export default function FillProfilePage() {
     return <Navigate to="/" from="/fill-profile" />;
   }
 
+  console.log(profileDetails);
+
   const whichTab = () => {
     switch (currentInfoTab) {
       case 'personal':
