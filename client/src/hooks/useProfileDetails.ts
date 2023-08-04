@@ -1,30 +1,42 @@
-import { useReducer } from "react";
-import { UserProfile, PersonalInfo, BasicInfo, OtherInfo, Preferences, PersonalInfoNoImages } from "@/types";
+import { useReducer } from 'react';
+import {
+  UserProfile,
+  PersonalInfo,
+  BasicInfo,
+  OtherInfo,
+  Preferences,
+  PersonalInfoNoImages,
+} from '@/types';
 
 enum ActionType {
-  SET_PERSONAL_DETAILS = "SET_PERSONAL_DETAILS",
-  SET_IMAGES = "SET_IMAGES",
-  SET_BASIC_DETAILS = "SET_BASIC_DETAILS",
-  SET_OTHER_DETAILS = "SET_OTHER_DETAILS",
-  SET_PREFERENCES = "SET_PREFERENCES",
-};
+  SET_PERSONAL_DETAILS = 'SET_PERSONAL_DETAILS',
+  SET_IMAGES = 'SET_IMAGES',
+  SET_BASIC_DETAILS = 'SET_BASIC_DETAILS',
+  SET_OTHER_DETAILS = 'SET_OTHER_DETAILS',
+  SET_PREFERENCES = 'SET_PREFERENCES',
+}
 
-type SetPersonalDetailsAction = ({
-  type: ActionType.SET_PERSONAL_DETAILS,
-  payload: PersonalInfoNoImages,
-} | {
-  type: ActionType.SET_IMAGES,
-  payload: string[],
-} | {
-  type: ActionType.SET_BASIC_DETAILS,
-  payload: BasicInfo,
-} | {
-  type: ActionType.SET_OTHER_DETAILS,
-  payload: OtherInfo,
-} | {
-  type: ActionType.SET_PREFERENCES,
-  payload: Preferences,
-});
+type SetPersonalDetailsAction =
+  | {
+      type: ActionType.SET_PERSONAL_DETAILS;
+      payload: PersonalInfoNoImages;
+    }
+  | {
+      type: ActionType.SET_IMAGES;
+      payload: string[];
+    }
+  | {
+      type: ActionType.SET_BASIC_DETAILS;
+      payload: BasicInfo;
+    }
+  | {
+      type: ActionType.SET_OTHER_DETAILS;
+      payload: OtherInfo;
+    }
+  | {
+      type: ActionType.SET_PREFERENCES;
+      payload: Preferences;
+    };
 
 function profileReducer(state: UserProfile, action: SetPersonalDetailsAction): UserProfile {
   const { type, payload } = action;
@@ -35,7 +47,7 @@ function profileReducer(state: UserProfile, action: SetPersonalDetailsAction): U
         personalInfo: {
           ...state.personalInfo,
           ...payload,
-        }
+        },
       };
     case ActionType.SET_IMAGES:
       return {
@@ -43,7 +55,7 @@ function profileReducer(state: UserProfile, action: SetPersonalDetailsAction): U
         personalInfo: {
           ...state.personalInfo,
           images: payload,
-        }
+        },
       };
     case ActionType.SET_BASIC_DETAILS:
       return {
@@ -63,20 +75,20 @@ function profileReducer(state: UserProfile, action: SetPersonalDetailsAction): U
     default:
       return state;
   }
-};
+}
 
 export function useProfileDetails() {
   const [profileDetails, dispatch] = useReducer(profileReducer, {
     personalInfo: {
-      first_name: "",
-      last_name: "",
-      dateOfBirth: "",
-      gender: "Prefer not to say",
+      first_name: '',
+      last_name: '',
+      dateOfBirth: '',
+      gender: 'Prefer not to say',
       images: [],
     },
     preferences: {
-      lookingFor: "",
-      attraction: "",
+      lookingFor: '',
+      attraction: '',
       ageRange: {
         min: 18,
         max: 100,
@@ -84,11 +96,15 @@ export function useProfileDetails() {
     },
   });
 
-  const setPersonalDetails = (payload: PersonalInfoNoImages) => dispatch({ type: ActionType.SET_PERSONAL_DETAILS, payload });
+  const setPersonalDetails = (payload: PersonalInfoNoImages) =>
+    dispatch({ type: ActionType.SET_PERSONAL_DETAILS, payload });
   const setImages = (payload: string[]) => dispatch({ type: ActionType.SET_IMAGES, payload });
-  const setBasicDetails = (payload: BasicInfo) => dispatch({ type: ActionType.SET_BASIC_DETAILS, payload });
-  const setOtherDetails = (payload: OtherInfo) => dispatch({ type: ActionType.SET_OTHER_DETAILS, payload });
-  const setPreferences = (payload: Preferences) => dispatch({ type: ActionType.SET_PREFERENCES, payload });
+  const setBasicDetails = (payload: BasicInfo) =>
+    dispatch({ type: ActionType.SET_BASIC_DETAILS, payload });
+  const setOtherDetails = (payload: OtherInfo) =>
+    dispatch({ type: ActionType.SET_OTHER_DETAILS, payload });
+  const setPreferences = (payload: Preferences) =>
+    dispatch({ type: ActionType.SET_PREFERENCES, payload });
 
   return {
     profileDetails,
@@ -97,5 +113,5 @@ export function useProfileDetails() {
     setBasicDetails,
     setOtherDetails,
     setPreferences,
-  }
-};
+  };
+}

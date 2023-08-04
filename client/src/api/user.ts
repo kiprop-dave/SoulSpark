@@ -1,5 +1,5 @@
-import { api } from "./base";
-import { loggedInUserSchema, LoggedInUser } from "@/types";
+import { api } from './base';
+import { loggedInUserSchema, LoggedInUser } from '@/types';
 
 export const getLoggedInUser = async (): Promise<LoggedInUser | null> => {
   try {

@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo } from 'react';
 
 type InfoTab = 'personal' | 'basic' | 'other' | 'preferences';
 
@@ -31,8 +31,8 @@ export const useDetailsPagination = () => {
     setCurrentTabIndex((prev) => {
       if (prev === 0) return prev;
       return prev - 1;
-    })
+    });
   };
 
   return { currentInfoTab, nextTab, prevTab };
-}
+};

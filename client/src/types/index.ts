@@ -13,7 +13,12 @@ export const personalInfoSchema = z.object({
   first_name: z.string(),
   last_name: z.string(),
   dateOfBirth: z.string(),
-  gender: z.union([z.literal('Male'), z.literal('Female'), z.literal('Other'), z.literal('Prefer not to say')]),
+  gender: z.union([
+    z.literal('Male'),
+    z.literal('Female'),
+    z.literal('Other'),
+    z.literal('Prefer not to say'),
+  ]),
   images: z.array(z.string()),
 });
 
@@ -30,18 +35,23 @@ export const basicInfoSchema = z.object({
 
 export type BasicInfo = z.infer<typeof basicInfoSchema>;
 
-export const otherInfoSchema = z.object({
-  interests: z.array(z.string()).optional(),
-  diet: z.string().optional(),
-  drinking: z.string().optional(),
-  smoking: z.string().optional(),
-  pets: z.string().optional(),
-  socials: z.object({// TODO:Probably should not be there.
-    facebook: z.string().optional(),
-    instagram: z.string().optional(),
-    twitter: z.string().optional(),
-  }).optional(),
-}).optional();
+export const otherInfoSchema = z
+  .object({
+    interests: z.array(z.string()).optional(),
+    diet: z.string().optional(),
+    drinking: z.string().optional(),
+    smoking: z.string().optional(),
+    pets: z.string().optional(),
+    socials: z
+      .object({
+        // TODO:Probably should not be there.
+        facebook: z.string().optional(),
+        instagram: z.string().optional(),
+        twitter: z.string().optional(),
+      })
+      .optional(),
+  })
+  .optional();
 
 export type OtherInfo = z.infer<typeof otherInfoSchema>;
 
@@ -51,7 +61,7 @@ export const preferencesSchema = z.object({
   ageRange: z.object({
     min: z.number().min(18).max(100),
     max: z.number().min(18).max(100),
-  })
+  }),
 });
 
 export type Preferences = z.infer<typeof preferencesSchema>;
