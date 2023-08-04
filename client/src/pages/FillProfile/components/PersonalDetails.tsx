@@ -1,8 +1,12 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { personalInfoSchema } from "@/types";
+import { personalInfoSchema, PersonalInfo, UserProfile, PersonalInfoNoImages } from "@/types";
+
 interface PersonalDetailsProps {
+  profileDetails: UserProfile;
   nextStep: () => void;
+  setPersonalDetails: (details: PersonalInfoNoImages) => void;
+  setImages: (imageurls: string[]) => void;
 };
 
 export default function PersonalDetailsTab({ nextStep }: PersonalDetailsProps): JSX.Element {

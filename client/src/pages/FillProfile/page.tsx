@@ -1,6 +1,7 @@
 import { Navigate, } from "@tanstack/router";
 import { useAuth } from "@/context/AuthContext";
 import { useDetailsPagination } from "@/hooks/useDetailsPagination";
+import { useProfileDetails } from "@/hooks/useProfileDetails";
 import PersonalDetailsTab from "./components/PersonalDetails";
 import BasicDetailsTab from "./components/BasicDetails";
 import OtherDetailsTab from "./components/OtherDetails";
@@ -9,6 +10,9 @@ import PreferencesDetailsTab from "./components/PreferencesDetails";
 export default function FillProfilePage() {
   const { user } = useAuth();
   const { currentInfoTab, nextTab, prevTab } = useDetailsPagination();
+  const { profileDetails, setPersonalDetails, setImages, setBasicDetails,
+    setOtherDetails, setPreferences
+  } = useProfileDetails();
 
   if (!user) {
     return <Navigate to='/' from="/fill-profile" />
@@ -17,7 +21,7 @@ export default function FillProfilePage() {
   const whichTab = () => {
     switch (currentInfoTab) {
       case "personal":
-        return <PersonalDetailsTab nextStep={nextTab} />;
+        return <PersonalDetailsTab nextStep={nextTab} setImages={setImages} setPersonalDetails={setPersonalDetails} profileDetails={profileDetails} />;
       case "basic":
         return <BasicDetailsTab prevStep={prevTab} nextStep={nextTab} />;
       case "other":
@@ -25,7 +29,7 @@ export default function FillProfilePage() {
       case "preferences":
         return <PreferencesDetailsTab prevStep={prevTab} />;
       default:
-        return <PersonalDetailsTab nextStep={nextTab} />;
+        return <PersonalDetailsTab nextStep={nextTab} setImages={setImages} setPersonalDetails={setPersonalDetails} profileDetails={profileDetails} />;
     }
   }
 

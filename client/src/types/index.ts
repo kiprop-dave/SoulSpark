@@ -13,11 +13,12 @@ export const personalInfoSchema = z.object({
   first_name: z.string(),
   last_name: z.string(),
   dateOfBirth: z.string(),
-  gender: z.union([z.literal('Male'), z.literal('Female'), z.literal('Other')]),
+  gender: z.union([z.literal('Male'), z.literal('Female'), z.literal('Other'), z.literal('Prefer not to say')]),
   images: z.array(z.string()),
 });
 
 export type PersonalInfo = z.infer<typeof personalInfoSchema>;
+export type PersonalInfoNoImages = Omit<PersonalInfo, 'images'>;
 
 export const basicInfoSchema = z.object({
   bio: z.string().optional(),
@@ -35,7 +36,7 @@ export const otherInfoSchema = z.object({
   drinking: z.string().optional(),
   smoking: z.string().optional(),
   pets: z.string().optional(),
-  socials: z.object({
+  socials: z.object({// TODO:Probably should not be there.
     facebook: z.string().optional(),
     instagram: z.string().optional(),
     twitter: z.string().optional(),
