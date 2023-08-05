@@ -33,24 +33,36 @@ export default function FillProfilePage() {
             nextStep={nextTab}
             setImages={setImages}
             setPersonalDetails={setPersonalDetails}
-            profileDetails={profileDetails}
           />
         );
       case 'basic':
         return (
-          <BasicDetailsTab prevStep={prevTab} nextStep={nextTab} confirmStep={setBasicDetails} />
+          <BasicDetailsTab
+            prevStep={prevTab}
+            nextStep={nextTab}
+            confirmStep={setBasicDetails}
+            initialInfo={profileDetails.basicInfo}
+          />
         );
       case 'other':
-        return <OtherDetailsTab prevStep={prevTab} nextStep={nextTab} />;
+        return (
+          <OtherDetailsTab
+            prevStep={prevTab}
+            nextStep={nextTab}
+            initialValues={profileDetails.otherInfo}
+            confirmStep={setOtherDetails}
+          />
+        );
       case 'preferences':
-        return <PreferencesDetailsTab prevStep={prevTab} />;
+        return (
+          <PreferencesDetailsTab prevStep={prevTab} initialInfo={profileDetails.preferences} />
+        );
       default:
         return (
           <PersonalDetailsTab
             nextStep={nextTab}
             setImages={setImages}
             setPersonalDetails={setPersonalDetails}
-            profileDetails={profileDetails}
           />
         );
     }

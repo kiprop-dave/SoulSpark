@@ -35,23 +35,14 @@ export const basicInfoSchema = z.object({
 
 export type BasicInfo = z.infer<typeof basicInfoSchema>;
 
-export const otherInfoSchema = z
-  .object({
-    interests: z.array(z.string()).optional(),
-    diet: z.string().optional(),
-    drinking: z.string().optional(),
-    smoking: z.string().optional(),
-    pets: z.string().optional(),
-    socials: z
-      .object({
-        // TODO:Probably should not be there.
-        facebook: z.string().optional(),
-        instagram: z.string().optional(),
-        twitter: z.string().optional(),
-      })
-      .optional(),
-  })
-  .optional();
+export const otherInfoSchema = z.object({
+  interests: z.array(z.string()).optional(),
+  diet: z.string().optional(),
+  drinking: z.string().optional(),
+  smoking: z.string().optional(),
+  pets: z.string().optional(),
+  socialMediaActivity: z.string().optional(),
+});
 
 export type OtherInfo = z.infer<typeof otherInfoSchema>;
 
@@ -69,7 +60,7 @@ export type Preferences = z.infer<typeof preferencesSchema>;
 export const userProfileSchema = z.object({
   personalInfo: personalInfoSchema,
   basicInfo: basicInfoSchema.optional(),
-  otherInfo: otherInfoSchema,
+  otherInfo: otherInfoSchema.optional(),
   preferences: preferencesSchema,
 });
 

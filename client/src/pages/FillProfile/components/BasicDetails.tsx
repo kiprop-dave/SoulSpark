@@ -6,6 +6,7 @@ import OptionSelect from '@/components/OptionSelect';
 import ProfileNavigation from '@/components/ProfileNavigation';
 
 interface BasicDetailsTabProps {
+  initialInfo?: BasicInfo;
   nextStep: () => void;
   prevStep: () => void;
   confirmStep: (basicInfo: BasicInfo) => void;
@@ -15,14 +16,17 @@ export default function BasicDetailsTab({
   nextStep,
   prevStep,
   confirmStep,
+  initialInfo,
 }: BasicDetailsTabProps): JSX.Element {
-  const [basicInfo, setBasicInfo] = useState<BasicInfo>({
-    bio: '',
-    languages: [],
-    zodiac: '',
-    education: '',
-    occupation: '',
-  });
+  const [basicInfo, setBasicInfo] = useState<BasicInfo>(
+    initialInfo || {
+      bio: '',
+      occupation: '',
+      education: '',
+      zodiac: '',
+      languages: [],
+    }
+  );
 
   const educationLevels = useMemo(
     () => ['High School', 'In College', 'Bachelors', 'Masters', 'PhD', 'Trade School'],
@@ -66,8 +70,8 @@ export default function BasicDetailsTab({
     e.preventDefault();
     try {
       const validated = basicInfoSchema.parse(basicInfo);
-      console.log(validated);
       confirmStep(validated);
+      nextStep();
     } catch (err) {
       if (err instanceof ZodError) {
         //TODO:Add a toast to show the error
