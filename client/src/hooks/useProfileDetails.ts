@@ -18,25 +18,25 @@ enum ActionType {
 
 type SetPersonalDetailsAction =
   | {
-      type: ActionType.SET_PERSONAL_DETAILS;
-      payload: PersonalInfoNoImages;
-    }
+    type: ActionType.SET_PERSONAL_DETAILS;
+    payload: PersonalInfoNoImages;
+  }
   | {
-      type: ActionType.SET_IMAGES;
-      payload: string[];
-    }
+    type: ActionType.SET_IMAGES;
+    payload: string[];
+  }
   | {
-      type: ActionType.SET_BASIC_DETAILS;
-      payload: BasicInfo;
-    }
+    type: ActionType.SET_BASIC_DETAILS;
+    payload: BasicInfo;
+  }
   | {
-      type: ActionType.SET_OTHER_DETAILS;
-      payload: OtherInfo;
-    }
+    type: ActionType.SET_OTHER_DETAILS;
+    payload: OtherInfo;
+  }
   | {
-      type: ActionType.SET_PREFERENCES;
-      payload: Preferences;
-    };
+    type: ActionType.SET_PREFERENCES;
+    payload: Preferences;
+  };
 
 function profileReducer(state: UserProfile, action: SetPersonalDetailsAction): UserProfile {
   const { type, payload } = action;

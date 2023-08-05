@@ -50,8 +50,8 @@ export const preferencesSchema = z.object({
   lookingFor: z.string().optional(),
   attraction: z.string().optional(),
   ageRange: z.object({
-    min: z.number().min(18).max(100),
-    max: z.number().min(18).max(100),
+    min: z.number().min(18).max(100).default(18),
+    max: z.number().min(18).max(100).default(100),
   }),
 });
 

@@ -125,7 +125,7 @@ export default function BasicDetailsTab({
           <label htmlFor="languages" className="text-sm font-bold text-slate-500">
             Languages
           </label>
-          <div className="grid grid-cols-4 w-full mt-2 gap-2">
+          <div className="flex flex-wrap w-full mt-2 gap-2">
             {languages.map((lang, i) => {
               return (
                 <OptionSelect
@@ -144,7 +144,7 @@ export default function BasicDetailsTab({
           <label htmlFor="zodiac" className="text-sm font-bold text-slate-500">
             Zodiac
           </label>
-          <div className="grid grid-cols-4 w-full mt-2 gap-2">
+          <div className="flex flex-wrap w-full mt-2 gap-2">
             {zodiacSigns.map((sign) => {
               return (
                 <OptionSelect
@@ -162,7 +162,7 @@ export default function BasicDetailsTab({
           <label htmlFor="education" className="text-sm font-bold text-slate-500">
             What is your education level?
           </label>
-          <div className="grid grid-cols-3 w-full mt-2 gap-2">
+          <div className="flex flex-wrap w-full mt-2 gap-2">
             {educationLevels.map((level) => {
               return (
                 <OptionSelect
