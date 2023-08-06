@@ -9,28 +9,48 @@ export const loggedInUserSchema = z.object({
 
 export type LoggedInUser = z.infer<typeof loggedInUserSchema>;
 
+export const imageSchema = z
+  .object({
+    asset_id: z.string(),
+    public_id: z.string(),
+    format: z.string(),
+    resource_type: z.string(),
+    type: z.string(),
+    url: z.string(),
+    secure_url: z.string(),
+  })
+  .strip();
+
+export type Image = z.infer<typeof imageSchema>;
+
 export const personalInfoSchema = z.object({
   first_name: z.string().min(1, { message: 'Please enter your first name.' }),
   last_name: z.string().min(1, { message: 'Please enter your last name.' }),
-  dateOfBirth: z
-    .coerce.date()
+  dateOfBirth: z.coerce
+    .date()
     .min(new Date(1900, 0, 1), { message: 'Please enter a valid date of birth.' })
     .max(new Date(), { message: 'Please enter a valid date of birth.' })
-    .refine((date) => {
-      const ageDiffMs = Date.now() - date.getTime();
-      const ageDate = new Date(ageDiffMs);
-      const age = Math.abs(ageDate.getUTCFullYear() - 1970);
-      return age >= 18;
-    }, { message: 'You must be at least 18 years old.' }),
+    .refine(
+      (date) => {
+        const ageDiffMs = Date.now() - date.getTime();
+        const ageDate = new Date(ageDiffMs);
+        const age = Math.abs(ageDate.getUTCFullYear() - 1970);
+        return age >= 18;
+      },
+      { message: 'You must be at least 18 years old.' }
+    ),
   gender: z.union([
     z.literal('Male'),
     z.literal('Female'),
     z.literal('Other'),
     z.literal('Prefer not to say'),
   ]),
-  images: z.array(z.string()).refine((images) => {
-    return images.reduce((acc, img) => img.length > 0 ? acc + 1 : acc, 0) >= 1;
-  }, { message: 'Please upload at least one image.' }),
+  images: z.array(imageSchema).refine(
+    (images) => {
+      return images.reduce((acc, img) => (img.url.length > 0 ? acc + 1 : acc), 0) > 0;
+    },
+    { message: 'Please upload at least one image.' }
+  ),
 });
 
 export type PersonalInfo = z.infer<typeof personalInfoSchema>;

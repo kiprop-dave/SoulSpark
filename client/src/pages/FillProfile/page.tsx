@@ -55,7 +55,11 @@ export default function FillProfilePage() {
         );
       case 'preferences':
         return (
-          <PreferencesDetailsTab prevStep={prevTab} initialInfo={profileDetails.preferences} completeProfile={setPreferences} />
+          <PreferencesDetailsTab
+            prevStep={prevTab}
+            initialInfo={profileDetails.preferences}
+            completeProfile={setPreferences}
+          />
         );
       default:
         return (
