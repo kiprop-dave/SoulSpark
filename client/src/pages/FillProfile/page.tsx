@@ -2,10 +2,10 @@ import { Navigate } from '@tanstack/router';
 import { useAuth } from '@/context/AuthContext';
 import { useDetailsPagination } from '@/hooks/useDetailsPagination';
 import { useProfileDetails } from '@/hooks/useProfileDetails';
-import PersonalDetailsTab from './components/PersonalDetails';
-import BasicDetailsTab from './components/BasicDetails';
-import OtherDetailsTab from './components/OtherDetails';
-import PreferencesDetailsTab from './components/PreferencesDetails';
+import PersonalDetailsTab from './tabs/PersonalDetails';
+import BasicDetailsTab from './tabs/BasicDetails';
+import OtherDetailsTab from './tabs/OtherDetails';
+import PreferencesDetailsTab from './tabs/PreferencesDetails';
 
 export default function FillProfilePage() {
   const { user } = useAuth();
@@ -31,7 +31,7 @@ export default function FillProfilePage() {
         return (
           <PersonalDetailsTab
             nextStep={nextTab}
-            setImages={setImages}
+            initialInfo={profileDetails.personalInfo}
             setPersonalDetails={setPersonalDetails}
           />
         );

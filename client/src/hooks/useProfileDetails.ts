@@ -82,7 +82,7 @@ export function useProfileDetails() {
     personalInfo: {
       first_name: '',
       last_name: '',
-      dateOfBirth: '',
+      dateOfBirth: new Date(),
       gender: 'Prefer not to say',
       images: [],
     },

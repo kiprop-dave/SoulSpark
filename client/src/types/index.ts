@@ -10,16 +10,27 @@ export const loggedInUserSchema = z.object({
 export type LoggedInUser = z.infer<typeof loggedInUserSchema>;
 
 export const personalInfoSchema = z.object({
-  first_name: z.string(),
-  last_name: z.string(),
-  dateOfBirth: z.string(),
+  first_name: z.string().min(1, { message: 'Please enter your first name.' }),
+  last_name: z.string().min(1, { message: 'Please enter your last name.' }),
+  dateOfBirth: z
+    .coerce.date()
+    .min(new Date(1900, 0, 1), { message: 'Please enter a valid date of birth.' })
+    .max(new Date(), { message: 'Please enter a valid date of birth.' })
+    .refine((date) => {
+      const ageDiffMs = Date.now() - date.getTime();
+      const ageDate = new Date(ageDiffMs);
+      const age = Math.abs(ageDate.getUTCFullYear() - 1970);
+      return age >= 18;
+    }, { message: 'You must be at least 18 years old.' }),
   gender: z.union([
     z.literal('Male'),
     z.literal('Female'),
     z.literal('Other'),
     z.literal('Prefer not to say'),
   ]),
-  images: z.array(z.string()),
+  images: z.array(z.string()).refine((images) => {
+    return images.reduce((acc, img) => img.length > 0 ? acc + 1 : acc, 0) >= 1;
+  }, { message: 'Please upload at least one image.' }),
 });
 
 export type PersonalInfo = z.infer<typeof personalInfoSchema>;
