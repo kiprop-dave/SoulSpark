@@ -1,7 +1,7 @@
-import { useMemo } from 'react';
+import { useCallback, useEffect, useMemo } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm, SubmitHandler } from 'react-hook-form';
-import { personalInfoSchema, PersonalInfo, PersonalInfoNoImages, Image } from '@/types';
+import { personalInfoSchema, PersonalInfo, Image } from '@/types';
 import { Button } from '@/components/ui/button';
 import ImageUpload from '../components/ImageUpload';
 import OptionSelect from '@/components/OptionSelect';
@@ -17,21 +17,13 @@ export default function PersonalDetailsTab({
   initialInfo,
   setPersonalDetails,
 }: PersonalDetailsProps): JSX.Element {
-  const {
-    formState: { errors },
-    setValue,
-    handleSubmit,
-    register,
-    watch,
-  } = useForm<PersonalInfo>({
-    resolver: zodResolver(personalInfoSchema),
-    defaultValues: {
-      ...initialInfo,
-      images: (function () {
-        if (initialInfo?.images) {
+  const resetForm = useCallback((info?: PersonalInfo): PersonalInfo => {
+    return {
+      images: (function(): Image[] {
+        if (info?.images) {
           return [
-            ...initialInfo.images,
-            ...new Array<Image>(9 - initialInfo.images.length).fill({
+            ...info.images,
+            ...new Array<Image>(9 - info.images.length).fill({
               type: '',
               url: '',
               resource_type: '',
@@ -53,20 +45,49 @@ export default function PersonalDetailsTab({
           });
         }
       })(),
-    },
+      first_name: info?.first_name || '',
+      last_name: info?.last_name || '',
+      gender: info?.gender || 'PreferNotToSay',
+      dateOfBirth: info?.dateOfBirth || new Date(),
+    }
+  }, []);
+
+  const {
+    formState: { errors },
+    setValue,
+    handleSubmit,
+    register,
+    watch,
+    reset
+  } = useForm<PersonalInfo>({
+    resolver: zodResolver(personalInfoSchema),
+    defaultValues: useMemo(() => resetForm(initialInfo), [initialInfo]),
     mode: 'onSubmit',
   });
+
+  useEffect(() => {
+    if (initialInfo) {
+      reset(resetForm(initialInfo));
+    }
+  }, [initialInfo])
+
+
 
   const genderOptions = useMemo(() => ['Male', 'Female', 'Other', 'Prefer not to say'], []);
 
   const currentGender = watch('gender');
 
+
   const selectGender = (property: string, value: string) => {
+    // Convert the value to the correct database format
+    if (value === 'Prefer not to say') value = 'PreferNotToSay';
     //@ts-ignore
     setValue(property, value);
   };
 
   const images = watch('images');
+
+  console.log(initialInfo);
 
   // Insert the image into the first empty slot in the array
   const setImages = (value: Image) => {
@@ -95,9 +116,13 @@ export default function PersonalDetailsTab({
           </label>
           {errors.images && <span className="text-red-500 text-sm">{errors.images.message}</span>}
           <div className="w-full grid grid-cols-3 gap-2">
-            {images.map((img, i) => {
-              return <ImageUpload key={i} existingImage={img} setImages={setImages} index={i} />;
-            })}
+            {
+              images.map((img, i) => {
+                return (
+                  <ImageUpload existingImage={img} setImages={setImages} key={`${i}-${img.url}`} />
+                )
+              })
+            }
           </div>
         </div>
         <div className="flex flex-col">

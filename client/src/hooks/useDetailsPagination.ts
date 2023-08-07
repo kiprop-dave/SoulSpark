@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
 
-type InfoTab = 'personal' | 'basic' | 'other' | 'preferences';
+export type InfoTab = 'personal' | 'basic' | 'other' | 'preferences';
 
 export const useDetailsPagination = () => {
   const [currentTabIndex, setCurrentTabIndex] = useState(0);

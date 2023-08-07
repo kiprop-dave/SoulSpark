@@ -43,7 +43,7 @@ export const personalInfoSchema = z.object({
     z.literal('Male'),
     z.literal('Female'),
     z.literal('Other'),
-    z.literal('Prefer not to say'),
+    z.literal('PreferNotToSay'),
   ]),
   images: z.array(imageSchema).refine(
     (images) => {
@@ -54,7 +54,6 @@ export const personalInfoSchema = z.object({
 });
 
 export type PersonalInfo = z.infer<typeof personalInfoSchema>;
-export type PersonalInfoNoImages = Omit<PersonalInfo, 'images'>;
 
 export const basicInfoSchema = z.object({
   bio: z.string().max(500).optional(),

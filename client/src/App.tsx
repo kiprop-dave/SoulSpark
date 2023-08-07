@@ -21,7 +21,7 @@ const loginRoute = new Route({
 
 const fillProfileRoute = new Route({
   getParentRoute: () => rootRoute,
-  path: '/fill-profile',
+  path: '/edit-profile',
   component: FillProfilePage,
 });
 

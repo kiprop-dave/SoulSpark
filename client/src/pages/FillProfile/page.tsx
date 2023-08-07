@@ -1,80 +1,152 @@
-import { Navigate } from '@tanstack/router';
+import { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
-import { useDetailsPagination } from '@/hooks/useDetailsPagination';
-import { useProfileDetails } from '@/hooks/useProfileDetails';
+import { getUserProfile, createUserProfile } from '@/api/user';
+import { useDetailsPagination, InfoTab } from '@/hooks/useDetailsPagination';
+import { useProfileDetails, } from '@/hooks/useProfileDetails';
+import { useProfileContext, ProfileContextProvider } from '@/context/ProfileContext';
+import { BasicInfo, LoggedInUser, OtherInfo, PersonalInfo, Preferences, UserProfile } from '@/types';
+import AuthWrapper from '@/components/wrappers/AuthWrapper';
 import PersonalDetailsTab from './tabs/PersonalDetails';
 import BasicDetailsTab from './tabs/BasicDetails';
 import OtherDetailsTab from './tabs/OtherDetails';
 import PreferencesDetailsTab from './tabs/PreferencesDetails';
 
-export default function FillProfilePage() {
-  const { user } = useAuth();
+interface ChooseTabProps {
+  currentTab: InfoTab
+  nextTab: () => void
+  prevTab: () => void
+  profile: UserProfile
+  setPersonalDetails: (p: PersonalInfo) => void
+  setBasicDetails: (b: BasicInfo) => void
+  setOtherDetails: (o: OtherInfo) => void
+  setPreferences: (p: Preferences) => void
+}
+
+const ChooseTab = ({
+  currentTab,
+  setPersonalDetails,
+  setOtherDetails,
+  profile,
+  nextTab,
+  prevTab,
+  setBasicDetails,
+  setPreferences
+}: ChooseTabProps): JSX.Element => {
+  switch (currentTab) {
+    case 'personal':
+      return (
+        <PersonalDetailsTab
+          nextStep={nextTab}
+          initialInfo={profile.personalInfo}
+          setPersonalDetails={setPersonalDetails}
+        />
+      );
+    case 'basic':
+      return (
+        <BasicDetailsTab
+          prevStep={prevTab}
+          nextStep={nextTab}
+          confirmStep={setBasicDetails}
+          initialInfo={profile.basicInfo}
+        />
+      );
+    case 'other':
+      return (
+        <OtherDetailsTab
+          prevStep={prevTab}
+          nextStep={nextTab}
+          initialValues={profile.otherInfo}
+          confirmStep={setOtherDetails}
+        />
+      );
+    case 'preferences':
+      return (
+        <PreferencesDetailsTab
+          prevStep={prevTab}
+          initialInfo={profile.preferences}
+          completeProfile={setPreferences}
+        />
+      );
+    default:
+      return (
+        <PersonalDetailsTab
+          nextStep={nextTab}
+          setPersonalDetails={setPersonalDetails}
+        />
+      );
+  }
+}
+
+interface EditProfileProps {
+  initialDetails: UserProfile | null;
+  user: LoggedInUser;
+}
+
+function EditProfile({ initialDetails, user }: EditProfileProps): JSX.Element {
   const { currentInfoTab, nextTab, prevTab } = useDetailsPagination();
   const {
     profileDetails,
     setPersonalDetails,
-    setImages,
     setBasicDetails,
     setOtherDetails,
     setPreferences,
+    setAllDetails
   } = useProfileDetails();
 
-  if (!user) {
-    return <Navigate to="/" from="/fill-profile" />;
-  }
+  useEffect(() => {
+    if (initialDetails) {
+      setAllDetails(initialDetails);
+    }
+  }, [initialDetails])
 
   console.log(profileDetails);
 
-  const whichTab = () => {
-    switch (currentInfoTab) {
-      case 'personal':
-        return (
-          <PersonalDetailsTab
-            nextStep={nextTab}
-            initialInfo={profileDetails.personalInfo}
-            setPersonalDetails={setPersonalDetails}
-          />
-        );
-      case 'basic':
-        return (
-          <BasicDetailsTab
-            prevStep={prevTab}
-            nextStep={nextTab}
-            confirmStep={setBasicDetails}
-            initialInfo={profileDetails.basicInfo}
-          />
-        );
-      case 'other':
-        return (
-          <OtherDetailsTab
-            prevStep={prevTab}
-            nextStep={nextTab}
-            initialValues={profileDetails.otherInfo}
-            confirmStep={setOtherDetails}
-          />
-        );
-      case 'preferences':
-        return (
-          <PreferencesDetailsTab
-            prevStep={prevTab}
-            initialInfo={profileDetails.preferences}
-            completeProfile={setPreferences}
-          />
-        );
-      default:
-        return (
-          <PersonalDetailsTab
-            nextStep={nextTab}
-            setImages={setImages}
-            setPersonalDetails={setPersonalDetails}
-          />
-        );
+  const confirmProfileDetails = (preferences: Preferences) => {
+    setPreferences(preferences);
+    // Since react updates state asynchronously, we need to pass the preferences immediately
+    if (!user.filledProfile) {
+      createUserProfile(user.accessToken, user.id, { ...profileDetails, preferences: preferences })
+        .then((updatedProfile) => {
+          if (updatedProfile) {
+            setAllDetails(updatedProfile);
+          }
+        })
     }
   };
 
   return (
     <div className="flex flex-col items-center p-4 w-full h-full sm:w-[50%] sm:h-[95%] md:w-[30%] bg-slate-50 rounded shadow shadow-gray-300 overflow-y-scroll no-scrollbar">
-      {whichTab()}
+      <ChooseTab
+        currentTab={currentInfoTab}
+        nextTab={nextTab}
+        prevTab={prevTab}
+        setPreferences={confirmProfileDetails}
+        setBasicDetails={setBasicDetails}
+        setOtherDetails={setOtherDetails}
+        setPersonalDetails={setPersonalDetails}
+        profile={profileDetails}
+      />
     </div>
+  );
+}
+
+export default function EditProfilePage(): JSX.Element {
+  const { user } = useAuth();
+  const [initialDetails, setInitialDetails] = useState<UserProfile | null>(null);
+
+  useEffect(() => {
+    // Fetched the logged in user's details
+    if (user) {
+      getUserProfile(user.id, user.accessToken)
+        .then((profile) => {
+          setInitialDetails(profile);
+        })
+    }
+  }, [])
+
+  return (
+    <AuthWrapper>
+      <EditProfile initialDetails={initialDetails} user={user!} />
+    </AuthWrapper>
   );
 }
