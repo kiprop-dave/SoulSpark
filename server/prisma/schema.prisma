@@ -39,21 +39,31 @@ enum OauthProvider {
 }
 
 model Profile {
-  id          String   @id @default(uuid())
-  first_name  String   @db.VarChar(50)
-  last_name   String   @db.VarChar(50)
-  dateOfBirth DateTime
-  gender      Gender
-  images      String[]
-  languages   String[]
-  bio         String
-  basicInfo   String[]
-  interests   String[]
-  lifestyle   String[]
-  socials     String[]
-  lookingFor  String
-  userId      String   @unique
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id                  String         @id @default(uuid())
+  first_name          String         @db.VarChar(50)
+  last_name           String         @db.VarChar(50)
+  dateOfBirth         DateTime
+  gender              Gender
+  images              DigitalAsset[]
+  bio                 String?
+  languages           String[]
+  zodiac              String?        @db.VarChar(50)
+  education           String?        @db.VarChar(50)
+  occupation          String?        @db.VarChar(50)
+  interests           String[]
+  diet                String?        @db.VarChar(50)
+  drinking            String?        @db.VarChar(50)
+  smoking             String?        @db.VarChar(50)
+  pets                String?        @db.VarChar(50)
+  socialMediaActivity String?        @db.VarChar(50)
+  socials             String[]
+  lookingFor          String         @db.VarChar(150)
+  attraction          String         @db.VarChar(50)
+  minimumAge          Int
+  maximumAge          Int
+
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("profiles")
 }
@@ -62,6 +72,7 @@ enum Gender {
   Male
   Female
   Other
+  PreferNotToSay
 }
 
 model Conversation {
@@ -74,4 +85,21 @@ model Message {
   id String @id @default(uuid())
 
   @@map("messages")
+}
+
+model DigitalAsset {
+  id            String   @id @default(uuid())
+  asset_id      String   @unique
+  public_id     String   @unique
+  format        String   @db.VarChar(50)
+  resource_type String   @db.VarChar(50)
+  type          String   @db.VarChar(50)
+  created_at    DateTime @default(now())
+  url           String   @db.VarChar(255)
+  secure_url    String   @db.VarChar(255)
+
+  profileId String?
+  profile   Profile? @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  @@map("digital_assets")
 }

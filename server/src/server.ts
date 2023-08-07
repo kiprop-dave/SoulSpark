@@ -5,6 +5,7 @@ import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import authRouter from './routes/auth';
 import oauthCallbackRouter from './routes/oauthCallback';
+import usersRouter from './routes/users/users';
 import { env } from './lib/env';
 import { appConstants } from './utils/constants';
 
@@ -23,9 +24,18 @@ app.use(cors({
   credentials: true,
   optionsSuccessStatus: 200
 }));
+
 app.use(cookieParser());
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 app.use('/auth', authRouter);
 app.use('/oauth/callback', oauthCallbackRouter);
+app.use('/users', usersRouter);
+
+
+app.use("*", (_, res) => {
+  return res.status(404).send("Not found");
+})
 
 app.listen(env.PORT, () => console.log(`Server running on port ${env.PORT}`));

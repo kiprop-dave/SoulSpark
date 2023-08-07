@@ -9,12 +9,12 @@ export function generateAccessToken(userId: string, expiresIn: string) {
 };
 
 // This function will verify a web token for a user.
-export function verifyAccessToken(token: string): boolean {
+export function verifyAccessToken<T>(token: string): T | null {
   try {
-    verify(token, env.ACCESS_TOKEN_SECRET);
-    return true;
+    const payload = verify(token, env.ACCESS_TOKEN_SECRET);
+    return payload as T;
   } catch {
-    return false;
+    return null;
   }
 };
 
