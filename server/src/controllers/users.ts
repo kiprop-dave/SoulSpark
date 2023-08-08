@@ -1,5 +1,5 @@
-import { ZodError } from "zod";
-import prisma from "../lib/prisma";
+import { ZodError } from 'zod';
+import prisma from '../lib/prisma';
 import {
   GoogleUserInfo,
   userProfileSchema,
@@ -9,26 +9,26 @@ import {
   otherInfoSchema,
   preferencesSchema,
   PersonalInfo,
-} from "../types";
+} from '../types';
 
-type UserInfo = GoogleUserInfo
+type UserInfo = GoogleUserInfo;
 
-export async function createAcccount(userInfo: UserInfo, provider: "Google" | "Facebook") {
+export async function createAcccount(userInfo: UserInfo, provider: 'Google' | 'Facebook') {
   try {
     const exists = await prisma.account.findUnique({
       where: {
         provider_providerId: {
           providerId: userInfo.id,
-          provider: provider
-        }
+          provider: provider,
+        },
       },
       include: {
-        user: true
-      }
+        user: true,
+      },
     });
     if (exists) {
       return { id: exists.user.id, email: exists.user.email };
-    };
+    }
     const newUser = await prisma.user.create({
       data: {
         email: userInfo.email,
@@ -36,17 +36,17 @@ export async function createAcccount(userInfo: UserInfo, provider: "Google" | "F
         Account: {
           create: {
             provider: provider,
-            providerId: userInfo.id
-          }
-        }
-      }
+            providerId: userInfo.id,
+          },
+        },
+      },
     });
     return { id: newUser.id, email: newUser.email };
   } catch (err) {
     console.log(err);
-    throw new Error("Error creating user");
+    throw new Error('Error creating user');
   }
-};
+}
 
 // This checks if a user has completed the compulsory profile fields
 export async function checkUserProfile(userId: string): Promise<boolean> {
@@ -64,7 +64,7 @@ export async function checkUserProfile(userId: string): Promise<boolean> {
         maximumAge: true,
       },
       where: {
-        userId: userId
+        userId: userId,
       },
     });
 
@@ -79,17 +79,17 @@ export async function checkUserProfile(userId: string): Promise<boolean> {
     console.log(err);
     return false;
   }
-};
+}
 
 export async function getUserProfile(userId: string): Promise<UserProfile | null> {
   try {
     const profile = await prisma.profile.findUnique({
       where: {
-        userId: userId
+        userId: userId,
       },
       include: {
-        images: true
-      }
+        images: true,
+      },
     });
     if (profile === null) {
       return null;
@@ -103,47 +103,46 @@ export async function getUserProfile(userId: string): Promise<UserProfile | null
       attraction: profile.attraction,
       ageRange: {
         min: profile.minimumAge,
-        max: profile.maximumAge
-      }
+        max: profile.maximumAge,
+      },
     });
 
     return {
       personalInfo,
       basicInfo,
       otherInfo,
-      preferences
+      preferences,
     };
-
   } catch (err) {
     if (err instanceof ZodError) {
       console.log(err.issues);
     }
-    throw new Error("Error fetching user profile");
+    throw new Error('Error fetching user profile');
   }
-};
+}
 
 export async function updatePersonalInfo(userId: string, data: UserProfile): Promise<PersonalInfo> {
   try {
     const updatedPersonalInfo = await prisma.profile.update({
       where: {
-        userId: userId
+        userId: userId,
       },
       data: {
         images: {
-          create: data.personalInfo.images
+          create: data.personalInfo.images,
         },
         first_name: data.personalInfo.first_name,
         last_name: data.personalInfo.last_name,
         dateOfBirth: data.personalInfo.dateOfBirth,
-        gender: data.personalInfo.gender
-      }
+        gender: data.personalInfo.gender,
+      },
     });
     const validPersonalInfo = await personalInfoSchema.parseAsync(updatedPersonalInfo);
     return validPersonalInfo;
   } catch (err) {
-    throw new Error("Error updating personal info");
+    throw new Error('Error updating personal info');
   }
-};
+}
 
 // id                  String         @id @default(uuid())
 // first_name          String         @db.VarChar(50)
@@ -177,7 +176,7 @@ export async function createProfile(userId: string, data: UserProfile): Promise<
         dateOfBirth: data.personalInfo.dateOfBirth,
         gender: data.personalInfo.gender,
         images: {
-          create: data.personalInfo.images
+          create: data.personalInfo.images,
         },
         bio: data?.basicInfo?.bio,
         languages: data?.basicInfo?.languages,
@@ -196,13 +195,13 @@ export async function createProfile(userId: string, data: UserProfile): Promise<
         maximumAge: data.preferences.ageRange.max,
         user: {
           connect: {
-            id: userId
-          }
-        }
+            id: userId,
+          },
+        },
       },
       include: {
-        images: true
-      }
+        images: true,
+      },
     });
 
     const personalInfo = await personalInfoSchema.parseAsync(updatedUserInfo);
@@ -214,10 +213,10 @@ export async function createProfile(userId: string, data: UserProfile): Promise<
       personalInfo,
       basicInfo,
       otherInfo,
-      preferences
+      preferences,
     };
   } catch (err) {
     console.log(err);
-    throw new Error("Error updating user info");
+    throw new Error('Error updating user info');
   }
 }

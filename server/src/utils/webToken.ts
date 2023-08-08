@@ -1,12 +1,12 @@
 // This file contains functions to generate and verify web tokens.
 
-import { sign, verify } from "jsonwebtoken";
-import { env } from "../lib/env";
+import { sign, verify } from 'jsonwebtoken';
+import { env } from '../lib/env';
 
 // This function will generate a web token for a user.
 export function generateAccessToken(userId: string, expiresIn: string) {
   return sign({ userId }, env.ACCESS_TOKEN_SECRET, { expiresIn });
-};
+}
 
 // This function will verify a web token for a user.
 export function verifyAccessToken<T>(token: string): T | null {
@@ -16,7 +16,7 @@ export function verifyAccessToken<T>(token: string): T | null {
   } catch {
     return null;
   }
-};
+}
 
 // This function will verify a refresh token for a user.
 export function verifyRefreshToken<T>(token: string): T | null {
@@ -26,4 +26,4 @@ export function verifyRefreshToken<T>(token: string): T | null {
   } catch {
     return null;
   }
-};
+}

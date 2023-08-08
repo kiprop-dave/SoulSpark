@@ -19,4 +19,4 @@ connectRedis();
 
 redis.on('error', () => {
   console.error('Redis error');
-})
+});
