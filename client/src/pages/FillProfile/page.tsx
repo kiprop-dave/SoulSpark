@@ -1,15 +1,14 @@
-import { useState, useEffect } from 'react';
-import { useAuth } from '@/context/AuthContext';
-import { getUserProfile, createUserProfile } from '@/api/user';
+import { useEffect } from 'react';
+import { createUserProfile } from '@/api/user';
 import { useDetailsPagination, InfoTab } from '@/hooks/useDetailsPagination';
 import { useProfileDetails, } from '@/hooks/useProfileDetails';
-import { useProfileContext, ProfileContextProvider } from '@/context/ProfileContext';
 import { BasicInfo, LoggedInUser, OtherInfo, PersonalInfo, Preferences, UserProfile } from '@/types';
 import AuthWrapper from '@/components/wrappers/AuthWrapper';
 import PersonalDetailsTab from './tabs/PersonalDetails';
 import BasicDetailsTab from './tabs/BasicDetails';
 import OtherDetailsTab from './tabs/OtherDetails';
 import PreferencesDetailsTab from './tabs/PreferencesDetails';
+import { useUserProfile } from '@/context/UserProfileContext';
 
 interface ChooseTabProps {
   currentTab: InfoTab
@@ -131,22 +130,11 @@ function EditProfile({ initialDetails, user }: EditProfileProps): JSX.Element {
 }
 
 export default function EditProfilePage(): JSX.Element {
-  const { user } = useAuth();
-  const [initialDetails, setInitialDetails] = useState<UserProfile | null>(null);
-
-  useEffect(() => {
-    // Fetched the logged in user's details
-    if (user) {
-      getUserProfile(user.id, user.accessToken)
-        .then((profile) => {
-          setInitialDetails(profile);
-        })
-    }
-  }, [])
+  const { user, userProfile } = useUserProfile()
 
   return (
     <AuthWrapper>
-      <EditProfile initialDetails={initialDetails} user={user!} />
+      <EditProfile initialDetails={userProfile} user={user!} />
     </AuthWrapper>
   );
 }

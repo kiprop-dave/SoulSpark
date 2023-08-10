@@ -11,7 +11,11 @@ export default function LoginPage() {
   const { user } = useAuth();
 
   if (user && !user.filledProfile) {
-    return <Navigate to="/fill-profile" from="/" />;
+    return <Navigate to="/edit-profile" from="/" />;
+  }
+
+  if (user && user.filledProfile) {
+    return <Navigate to="/app" from="/" />;
   }
 
   // This is a redirect to the Google OAuth user consent screen.
