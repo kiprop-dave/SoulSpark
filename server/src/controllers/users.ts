@@ -1,3 +1,4 @@
+import { Prisma, User } from '@prisma/client';
 import { ZodError } from 'zod';
 import prisma from '../lib/prisma';
 import {
@@ -8,10 +9,48 @@ import {
   basicInfoSchema,
   otherInfoSchema,
   preferencesSchema,
-  PersonalInfo,
+  UserCredentials
 } from '../types';
 
 type UserInfo = GoogleUserInfo;
+
+type CreateUserResult = { status: "success" } | { status: "failed", message: "Conflict" } | { status: "failed", message: "Error" };
+type GetUserResult = { status: "success", user: User } | { status: "failed", message: "Not found" } | { status: "failed", message: "Error" };
+
+export async function createUser(details: UserCredentials): Promise<CreateUserResult> {
+  try {
+    await prisma.user.create({
+      data: {
+        email: details.email,
+        password: details.password
+      }
+    })
+    return { status: "success" };
+  } catch (err) {
+    if (err instanceof Prisma.PrismaClientKnownRequestError) {
+      if (err.code === "P2002") {
+        return { status: "failed", message: "Conflict" };
+      }
+    }
+    return { status: "failed", message: "Error" };
+  }
+}
+
+export async function getUserByEmail(email: string): Promise<GetUserResult> {
+  try {
+    const user = await prisma.user.findUnique({
+      where: {
+        email: email
+      }
+    })
+    if (user === null) {
+      return { status: "failed", message: "Not found" };
+    }
+    return { status: "success", user: user };
+  } catch (err) {
+    return { status: "failed", message: "Error" };
+  }
+}
 
 export async function createAcccount(userInfo: UserInfo, provider: 'Google' | 'Facebook') {
   try {
@@ -121,29 +160,6 @@ export async function getUserProfile(userId: string): Promise<UserProfile | null
   }
 }
 
-export async function updatePersonalInfo(userId: string, data: UserProfile): Promise<PersonalInfo> {
-  try {
-    const updatedPersonalInfo = await prisma.profile.update({
-      where: {
-        userId: userId,
-      },
-      data: {
-        images: {
-          create: data.personalInfo.images,
-        },
-        first_name: data.personalInfo.first_name,
-        last_name: data.personalInfo.last_name,
-        dateOfBirth: data.personalInfo.dateOfBirth,
-        gender: data.personalInfo.gender,
-      },
-    });
-    const validPersonalInfo = await personalInfoSchema.parseAsync(updatedPersonalInfo);
-    return validPersonalInfo;
-  } catch (err) {
-    throw new Error('Error updating personal info');
-  }
-}
-
 // id                  String         @id @default(uuid())
 // first_name          String         @db.VarChar(50)
 // last_name           String         @db.VarChar(50)
@@ -169,7 +185,7 @@ export async function updatePersonalInfo(userId: string, data: UserProfile): Pro
 //
 export async function createProfile(userId: string, data: UserProfile): Promise<UserProfile> {
   try {
-    const updatedUserInfo = await prisma.profile.create({
+    const createdProfile = await prisma.profile.create({
       data: {
         first_name: data.personalInfo.first_name,
         last_name: data.personalInfo.last_name,
@@ -204,10 +220,17 @@ export async function createProfile(userId: string, data: UserProfile): Promise<
       },
     });
 
-    const personalInfo = await personalInfoSchema.parseAsync(updatedUserInfo);
-    const basicInfo = await basicInfoSchema.parseAsync(updatedUserInfo);
-    const otherInfo = await otherInfoSchema.parseAsync(updatedUserInfo);
-    const preferences = await preferencesSchema.parseAsync(updatedUserInfo);
+    const personalInfo = await personalInfoSchema.parseAsync(createdProfile);
+    const basicInfo = await basicInfoSchema.parseAsync(createdProfile);
+    const otherInfo = await otherInfoSchema.parseAsync(createdProfile);
+    const preferences = await preferencesSchema.parseAsync({
+      lookingFor: createdProfile.lookingFor,
+      attraction: createdProfile.attraction,
+      ageRange: {
+        min: createdProfile.minimumAge,
+        max: createdProfile.maximumAge,
+      }
+    });
 
     return {
       personalInfo,

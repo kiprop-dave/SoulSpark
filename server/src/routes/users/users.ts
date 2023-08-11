@@ -26,6 +26,7 @@ usersRouter
   .post(async (req, res) => {
     try {
       const id = req.params.userId;
+      console.log(req.body);
       const data = await userProfileSchema.parseAsync(req.body);
       const updatedProfile = await createProfile(id, data);
       return res.status(200).json(updatedProfile);

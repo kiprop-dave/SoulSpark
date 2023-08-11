@@ -4,6 +4,7 @@ import { getLoggedInUser } from '@/api/user';
 
 type AuthContextType = {
   user: LoggedInUser | null;
+  setUserContext: (user: LoggedInUser | null) => void;
 };
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -15,10 +16,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     getLoggedInUser().then((user) => setUser(user));
   }, []);
 
+  const setUserContext = (user: LoggedInUser | null) => {
+    setUser(user);
+  }
+
   // console.log(user);
 
   const contextValue = {
     user,
+    setUserContext,
   };
 
   return <AuthContext.Provider value={contextValue}>{children}</AuthContext.Provider>;

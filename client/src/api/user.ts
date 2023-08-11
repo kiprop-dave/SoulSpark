@@ -1,5 +1,6 @@
+import { AxiosError } from 'axios';
 import { api } from './base';
-import { loggedInUserSchema, LoggedInUser, UserProfile, userProfileSchema } from '@/types';
+import { loggedInUserSchema, LoggedInUser, UserProfile, userProfileSchema, Credentials } from '@/types';
 
 export const getLoggedInUser = async (): Promise<LoggedInUser | null> => {
   try {
@@ -11,6 +12,35 @@ export const getLoggedInUser = async (): Promise<LoggedInUser | null> => {
     return null;
   }
 };
+
+type LoginResult = { status: 'success', user: LoggedInUser } | { status: 'error', error: string }
+
+export async function loginWithCredentials(cred: Credentials): Promise<LoginResult> {
+  try {
+    const { data } = await api.post('auth/login', cred);
+    const user = loggedInUserSchema.parse(data);
+    return { status: 'success', user };
+  } catch (err) {
+    if (err instanceof AxiosError) {
+      if (err.response?.status === 401) {
+        return { status: 'error', error: "Invalid credentials" }
+      } else if (err.response?.status === 500) {
+        return { status: 'error', error: "Internal server error" }
+      }
+    }
+    console.error(err);
+    return { status: 'error', error: "unknown_error" }
+  }
+}
+
+export async function signupWithCredentials(cred: Credentials): Promise<void> {
+  try {
+    await api.post('auth/register', cred);
+  } catch (err) {
+    console.error(err);
+    throw err;
+  }
+}
 
 export async function getUserProfile(id: string, accessToken: string): Promise<UserProfile | null> {
   try {
@@ -25,7 +55,7 @@ export async function getUserProfile(id: string, accessToken: string): Promise<U
     console.error(err);
     return null;
   }
-};
+}
 
 export async function createUserProfile(accessToken: string, id: string, profile: UserProfile): Promise<UserProfile | null> {
   console.log(profile);

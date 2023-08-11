@@ -13,7 +13,7 @@ import { Request, Response } from 'express';
 // is done when the user first logs in.
 type UserSessionData = Pick<User, 'id' | 'email'>;
 
-export async function createSession(res: Response, user: UserSessionData) {
+export async function createSession(res: Response, user: UserSessionData): Promise<SessionData> {
   try {
     const refreshToken = sign({ userId: user.id }, env.REFRESH_TOKEN_SECRET, { expiresIn: '7d' });
     const sessionData: SessionData = {
@@ -27,6 +27,7 @@ export async function createSession(res: Response, user: UserSessionData) {
       maxAge: 1000 * 60 * 60 * 24 * 7,
       httpOnly: true,
     });
+    return sessionData;
   } catch (err) {
     console.log(err);
     throw new Error('Error creating session');
