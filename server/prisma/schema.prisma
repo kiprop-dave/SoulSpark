@@ -11,13 +11,19 @@ datasource db {
 }
 
 model User {
-  id            String    @id @default(uuid())
-  email         String    @unique
-  emailVerified Boolean   @default(false)
-  Account       Account[]
+  id            String   @id @default(uuid())
+  email         String   @unique
+  emailVerified Boolean  @default(false)
+  password      String?  @db.VarChar(255)
+  createdAt     DateTime @default(now())
 
-  createdAt DateTime @default(now())
-  profile   Profile?
+  Account Account[]
+
+  profile Profile?
+
+  conversations Conversation[] @relation("conversationMembership")
+
+  Message Message[]
 
   @@map("users")
 }
@@ -76,13 +82,27 @@ enum Gender {
 }
 
 model Conversation {
-  id String @id @default(uuid())
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+
+  participants User[]    @relation("conversationMembership")
+  messages     Message[]
 
   @@map("conversations")
 }
 
 model Message {
-  id String @id @default(uuid())
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  text      String?
+
+  senderId String
+  sender   User?  @relation(fields: [senderId], references: [id], onDelete: Cascade)
+
+  attachment DigitalAsset?
+
+  Conversation   Conversation? @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  conversationId String
 
   @@map("messages")
 }
@@ -100,6 +120,9 @@ model DigitalAsset {
 
   profileId String?
   profile   Profile? @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  messageId String?  @unique
+  message   Message? @relation(fields: [messageId], references: [id], onDelete: Cascade)
 
   @@map("digital_assets")
 }
