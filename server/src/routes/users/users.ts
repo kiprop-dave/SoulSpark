@@ -14,9 +14,11 @@ usersRouter
     const id = req.params.userId;
     try {
       const profile = await getUserProfile(id);
+
       if (profile === null) {
         return res.status(404).send('User not found');
       }
+
       return res.status(200).json(profile);
     } catch (err) {
       console.log(err);

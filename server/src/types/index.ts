@@ -11,7 +11,7 @@ export type SessionData = z.infer<typeof sessionDataSchema>;
 export const accessTokenSchema = z
   .object({
     access_token: z.string(),
-    id_token: z.string(),
+    id_token: z.string().optional(),
   })
   .strip();
 
@@ -26,6 +26,13 @@ export const googleUserInfoSchema = z.object({
 });
 
 export type GoogleUserInfo = z.infer<typeof googleUserInfoSchema>;
+
+export const userCredentialsSchema = z.object({
+  email: z.string().email(),
+  password: z.string().min(5),// TODO:Change to 8 in production
+});
+
+export type UserCredentials = z.infer<typeof userCredentialsSchema>;
 
 export const imageSchema = z
   .object({
@@ -77,11 +84,11 @@ export type PersonalInfo = z.infer<typeof personalInfoSchema>;
 
 export const basicInfoSchema = z
   .object({
-    bio: z.string().max(500).optional(),
-    languages: z.array(z.string()).optional(),
-    zodiac: z.string().optional(),
-    education: z.string().optional(),
-    occupation: z.string().optional(),
+    bio: z.string().max(500).optional().nullable().transform((val) => val || ''),
+    languages: z.array(z.string()).optional().nullable().transform((val) => val || []),
+    zodiac: z.string().optional().nullable().transform((val) => val || ''),
+    education: z.string().optional().nullable().transform((val) => val || ''),
+    occupation: z.string().optional().nullable().transform((val) => val || ''),
   })
   .strip();
 
@@ -89,12 +96,12 @@ export type BasicInfo = z.infer<typeof basicInfoSchema>;
 
 export const otherInfoSchema = z
   .object({
-    interests: z.array(z.string()).optional(),
-    diet: z.string().optional(),
-    drinking: z.string().optional(),
-    smoking: z.string().optional(),
-    pets: z.string().optional(),
-    socialMediaActivity: z.string().optional(),
+    interests: z.array(z.string()).optional().nullable().transform((val) => val || []),
+    diet: z.string().optional().nullable().transform((val) => val || ''),
+    drinking: z.string().optional().nullable().transform((val) => val || ''),
+    smoking: z.string().optional().nullable().transform((val) => val || ''),
+    pets: z.string().optional().nullable().transform((val) => val || ''),
+    socialMediaActivity: z.string().optional().nullable().transform((val) => val || ''),
   })
   .strip();
 
