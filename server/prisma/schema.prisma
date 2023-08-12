@@ -17,6 +17,11 @@ model User {
   password      String?  @db.VarChar(255)
   createdAt     DateTime @default(now())
 
+  // A user can like many users and be liked by many users
+  // When two users like each other, they are matched and can start a conversation
+  likes   User[] @relation("likes")
+  likedBy User[] @relation("likes")
+
   Account Account[]
 
   profile Profile?
