@@ -1,9 +1,9 @@
-
+import { Swipe } from './components/Swipe';
 
 export default function AppPage(): JSX.Element {
-
-
   return (
-    <div>This is the app page</div>
-  )
+    <div className="h-full w-full">
+      <Swipe />
+    </div>
+  );
 }

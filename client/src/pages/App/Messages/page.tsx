@@ -1,8 +1,8 @@
-import { MatchesList } from "../components/MatchesList"
-import { MessagesList } from "../components/MessagesList"
+import { MatchesList } from '../components/MatchesList';
+import { MessagesList } from '../components/MessagesList';
+import { Swipe } from '../components/Swipe';
 
 export function MessagesPage(): JSX.Element {
-
   return (
     <>
       <div className="md:hidden w-full overflow-scroll no-scrollbar">
@@ -17,7 +17,9 @@ export function MessagesPage(): JSX.Element {
           <MessagesList />
         </div>
       </div>
-      <div className="hidden md:block">Swipe component goes here</div>
+      <div className="hidden w-full h-full md:flex md:items-center md:justify-center border-2 border-black">
+        <Swipe />
+      </div>
     </>
-  )
+  );
 }
