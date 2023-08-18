@@ -7,9 +7,9 @@ import {
   BiSpaceBar,
 } from 'react-icons/bi';
 
-interface SwipeProps {}
+interface SwipeProps { }
 
-export function Swipe({}: SwipeProps): JSX.Element {
+export function Swipe({ }: SwipeProps): JSX.Element {
   const [showControls, setShowControls] = useState<boolean>(true);
   const swipeRef = useRef<HTMLDivElement | null>(null);
 
@@ -57,7 +57,7 @@ export function Swipe({}: SwipeProps): JSX.Element {
       tabIndex={0}
       ref={swipeRef}
     >
-      <div className="w-full md:w-[38%] h-full rounded-xl md:h-[92%] md:shadow md:shadow-black">
+      <div className="w-full md:w-[38%] h-full rounded-xl md:h-[92%] md:shadow md:shadow-black dark:bg-neutral-800 dark:shadow-white">
         Profile
       </div>
       <div className="hidden md:flex items-center justify-center w-full h-10 mt-auto">
@@ -72,7 +72,7 @@ export function Swipe({}: SwipeProps): JSX.Element {
           <div className="flex items-center gap-4 ml-2">
             {swipeControls.map(({ icon: Icon, text }, i) => {
               return (
-                <div key={i} className="flex items-center gap-1 text-slate-800 h-10">
+                <div key={i} className="flex items-center gap-1 text-slate-800 h-10 dark:text-slate-300">
                   <Icon />
                   <p className="font-semibold tracking-wider">{text}</p>
                 </div>

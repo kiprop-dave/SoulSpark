@@ -18,7 +18,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const setUserContext = (user: LoggedInUser | null) => {
     setUser(user);
-  }
+  };
 
   // console.log(user);
 

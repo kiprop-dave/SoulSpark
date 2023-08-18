@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState } from 'react';
 
 // This hook is used to manage the state of an image carousel component
 export const useImagesCarousel = (imagesNumber: number) => {
@@ -9,15 +9,15 @@ export const useImagesCarousel = (imagesNumber: number) => {
 
   const nextImage = () => {
     if (!atEnd) {
-      setCurrentIndex(prev => prev + 1);
+      setCurrentIndex((prev) => prev + 1);
     }
-  }
+  };
 
   const previousImage = () => {
     if (!atStart) {
-      setCurrentIndex(prev => prev - 1);
+      setCurrentIndex((prev) => prev - 1);
     }
-  }
+  };
 
   return {
     currentIndex,
@@ -25,5 +25,5 @@ export const useImagesCarousel = (imagesNumber: number) => {
     previousImage,
     atStart,
     atEnd,
-  }
-}
+  };
+};

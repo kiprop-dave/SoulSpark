@@ -18,7 +18,7 @@ export function ImagesCarousel({ images }: ImagesCarouselProps): JSX.Element {
 
   return (
     <div
-      className="w-full h-full rounded-lg relative overflow-scroll no-scrollbar"
+      className="w-full h-full rounded-lg relative"
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >

@@ -10,18 +10,18 @@ export function AppPageLayout({ children }: { children: React.ReactNode }): JSX.
   // Will fetch user matches and messages here, then pass them down to a sidebar in big screens
   return (
     <div className="w-full h-full flex flex-col justify-between md:flex md:flex-row md:justify-start">
-      <header className="md:hidden h-16 flex items-center">
+      <header className="md:hidden h-16 flex items-center dark:bg-neutral-950">
         <img src={logo} alt="logo" className="w-8 h-8 mr-2" />
         <h1 className="text-2xl font-bold text-red-500">SoulSpark</h1>
       </header>
-      <aside className="hidden md:block w-1/4 h-full border-r border-r-slate-300">
+      <aside className="hidden md:block w-1/4 h-full bg-slate-100 dark:bg-neutral-950 border-r border-r-slate-300 dark:border-r-gray-700">
         <SideBarHeader personalInfo={userProfile?.personalInfo} />
         <SidebarBody />
       </aside>
-      <main className="flex flex-col items-center justify-center bg-slate-100 h-full w-full md:w-3/4 overflow-scroll no-scrollbar">
+      <main className="flex flex-col items-center justify-center bg-slate-100 dark:bg-neutral-950 h-full w-full md:w-3/4 overflow-scroll no-scrollbar">
         {children}
       </main>
-      <div className="w-full md:hidden block px-3 py-3">
+      <div className="w-full md:hidden block px-3 py-3 dark:bg-neutral-950">
         <MobileNavbar />
       </div>
     </div>

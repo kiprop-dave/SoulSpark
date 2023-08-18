@@ -3,16 +3,17 @@ import clsx from 'clsx';
 import { useAppRoutes } from '@/hooks/useAppRoutes';
 import { MatchesList } from './MatchesList';
 import { MessagesList } from './MessagesList';
+import { Settings } from './Settings';
 
-interface SidebarBodyProps {}
+interface SidebarBodyProps { }
 
 type SidebarTab = 'Matches' | 'Messages';
 
-export function SidebarBody({}: SidebarBodyProps): JSX.Element {
+export function SidebarBody({ }: SidebarBodyProps): JSX.Element {
   const { location } = useAppRoutes();
 
   return (
-    <div className="w-full h-[86%]">
+    <div className="w-full h-[86%] bg-white dark:bg-neutral-800">
       {location === '/profile' || location === '/settings' ? (
         <ProfileSettings />
       ) : (
@@ -22,8 +23,8 @@ export function SidebarBody({}: SidebarBodyProps): JSX.Element {
   );
 }
 
-interface MatchesMessagesProps {}
-function MatchesMessages({}: MatchesMessagesProps): JSX.Element {
+interface MatchesMessagesProps { }
+function MatchesMessages({ }: MatchesMessagesProps): JSX.Element {
   const [activeTab, setActiveTab] = useState<SidebarTab>('Matches');
 
   return (
@@ -35,7 +36,7 @@ function MatchesMessages({}: MatchesMessagesProps): JSX.Element {
           onClick={() => setActiveTab('Matches')}
         >
           <span
-            className={clsx('font-semibold text-sm', {
+            className={clsx('font-semibold text-sm dark:text-white', {
               'border-b-2 border-b-red-500': activeTab === 'Matches',
             })}
           >
@@ -48,7 +49,7 @@ function MatchesMessages({}: MatchesMessagesProps): JSX.Element {
           onClick={() => setActiveTab('Messages')}
         >
           <span
-            className={clsx('font-semibold text-sm', {
+            className={clsx('font-semibold text-sm dark:text-white', {
               'border-b-2 border-b-red-500': activeTab === 'Messages',
             })}
           >
@@ -61,11 +62,11 @@ function MatchesMessages({}: MatchesMessagesProps): JSX.Element {
   );
 }
 
-interface ProfileSettingsProps {}
-function ProfileSettings({}: ProfileSettingsProps): JSX.Element {
+interface ProfileSettingsProps { }
+function ProfileSettings({ }: ProfileSettingsProps): JSX.Element {
   return (
-    <div className="w-full h-full flex flex-col items-center justify-center">
-      TODO Profile Settings sidebar
+    <div className="w-full h-full flex flex-col bg-slate-100 dark:bg-neutral-950">
+      <Settings />
     </div>
   );
 }

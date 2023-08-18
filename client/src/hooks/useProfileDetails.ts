@@ -1,11 +1,5 @@
 import { useReducer, useState } from 'react';
-import {
-  UserProfile,
-  PersonalInfo,
-  BasicInfo,
-  OtherInfo,
-  Preferences,
-} from '@/types';
+import { UserProfile, PersonalInfo, BasicInfo, OtherInfo, Preferences } from '@/types';
 
 export function useProfileDetails() {
   const [profileDetails, setProfileDetails] = useState<UserProfile>({
@@ -24,27 +18,27 @@ export function useProfileDetails() {
         max: 100,
       },
     },
-  })
+  });
 
   const setPersonalDetails = (info: PersonalInfo) => {
-    setProfileDetails((prev) => ({ ...prev, personalInfo: info }))
+    setProfileDetails((prev) => ({ ...prev, personalInfo: info }));
   };
 
   const setBasicDetails = (info: BasicInfo) => {
     setProfileDetails((prev) => ({ ...prev, basicInfo: info }));
-  }
+  };
 
   const setOtherDetails = (info: OtherInfo) => {
     setProfileDetails((prev) => ({ ...prev, otherInfo: info }));
-  }
+  };
 
   const setPreferences = (info: Preferences) => {
-    setProfileDetails((prev) => ({ ...prev, preferences: info }))
-  }
+    setProfileDetails((prev) => ({ ...prev, preferences: info }));
+  };
 
   const setAllDetails = (details: UserProfile) => {
     setProfileDetails(details);
-  }
+  };
 
   return {
     profileDetails,
@@ -52,6 +46,6 @@ export function useProfileDetails() {
     setPersonalDetails,
     setBasicDetails,
     setOtherDetails,
-    setPreferences
-  }
+    setPreferences,
+  };
 }

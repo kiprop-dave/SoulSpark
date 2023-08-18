@@ -19,7 +19,7 @@ export default function PersonalDetailsTab({
 }: PersonalDetailsProps): JSX.Element {
   const resetForm = useCallback((info?: PersonalInfo): PersonalInfo => {
     return {
-      images: (function(): Image[] {
+      images: (function (): Image[] {
         if (info?.images) {
           return [
             ...info.images,
@@ -49,7 +49,7 @@ export default function PersonalDetailsTab({
       last_name: info?.last_name || '',
       gender: info?.gender || 'PreferNotToSay',
       dateOfBirth: info?.dateOfBirth || new Date(),
-    }
+    };
   }, []);
 
   const {
@@ -58,7 +58,7 @@ export default function PersonalDetailsTab({
     handleSubmit,
     register,
     watch,
-    reset
+    reset,
   } = useForm<PersonalInfo>({
     resolver: zodResolver(personalInfoSchema),
     defaultValues: useMemo(() => resetForm(initialInfo), [initialInfo]),
@@ -69,14 +69,11 @@ export default function PersonalDetailsTab({
     if (initialInfo) {
       reset(resetForm(initialInfo));
     }
-  }, [initialInfo])
-
-
+  }, [initialInfo]);
 
   const genderOptions = useMemo(() => ['Male', 'Female', 'Other', 'Prefer not to say'], []);
 
   const currentGender = watch('gender');
-
 
   const selectGender = (property: string, value: string) => {
     // Convert the value to the correct database format
@@ -116,13 +113,11 @@ export default function PersonalDetailsTab({
           </label>
           {errors.images && <span className="text-red-500 text-sm">{errors.images.message}</span>}
           <div className="w-full grid grid-cols-3 gap-2">
-            {
-              images.map((img, i) => {
-                return (
-                  <ImageUpload existingImage={img} setImages={setImages} key={`${i}-${img.url}`} />
-                )
-              })
-            }
+            {images.map((img, i) => {
+              return (
+                <ImageUpload existingImage={img} setImages={setImages} key={`${i}-${img.url}`} />
+              );
+            })}
           </div>
         </div>
         <div className="flex flex-col">

@@ -1,8 +1,16 @@
 import { useEffect } from 'react';
+import { useNavigate } from '@tanstack/router';
 import { createUserProfile } from '@/api/user';
 import { useDetailsPagination, InfoTab } from '@/hooks/useDetailsPagination';
-import { useProfileDetails, } from '@/hooks/useProfileDetails';
-import { BasicInfo, LoggedInUser, OtherInfo, PersonalInfo, Preferences, UserProfile } from '@/types';
+import { useProfileDetails } from '@/hooks/useProfileDetails';
+import {
+  BasicInfo,
+  LoggedInUser,
+  OtherInfo,
+  PersonalInfo,
+  Preferences,
+  UserProfile,
+} from '@/types';
 import AuthWrapper from '@/components/wrappers/AuthWrapper';
 import PersonalDetailsTab from './tabs/PersonalDetails';
 import BasicDetailsTab from './tabs/BasicDetails';
@@ -11,14 +19,14 @@ import PreferencesDetailsTab from './tabs/PreferencesDetails';
 import { useUserProfile } from '@/context/UserProfileContext';
 
 interface ChooseTabProps {
-  currentTab: InfoTab
-  nextTab: () => void
-  prevTab: () => void
-  profile: UserProfile
-  setPersonalDetails: (p: PersonalInfo) => void
-  setBasicDetails: (b: BasicInfo) => void
-  setOtherDetails: (o: OtherInfo) => void
-  setPreferences: (p: Preferences) => void
+  currentTab: InfoTab;
+  nextTab: () => void;
+  prevTab: () => void;
+  profile: UserProfile;
+  setPersonalDetails: (p: PersonalInfo) => void;
+  setBasicDetails: (b: BasicInfo) => void;
+  setOtherDetails: (o: OtherInfo) => void;
+  setPreferences: (p: Preferences) => void;
 }
 
 const ChooseTab = ({
@@ -29,7 +37,7 @@ const ChooseTab = ({
   nextTab,
   prevTab,
   setBasicDetails,
-  setPreferences
+  setPreferences,
 }: ChooseTabProps): JSX.Element => {
   switch (currentTab) {
     case 'personal':
@@ -67,14 +75,9 @@ const ChooseTab = ({
         />
       );
     default:
-      return (
-        <PersonalDetailsTab
-          nextStep={nextTab}
-          setPersonalDetails={setPersonalDetails}
-        />
-      );
+      return <PersonalDetailsTab nextStep={nextTab} setPersonalDetails={setPersonalDetails} />;
   }
-}
+};
 
 interface EditProfileProps {
   initialDetails: UserProfile | null;
@@ -89,14 +92,16 @@ function EditProfile({ initialDetails, user }: EditProfileProps): JSX.Element {
     setBasicDetails,
     setOtherDetails,
     setPreferences,
-    setAllDetails
+    setAllDetails,
   } = useProfileDetails();
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (initialDetails) {
       setAllDetails(initialDetails);
     }
-  }, [initialDetails])
+  }, [initialDetails]);
 
   console.log(profileDetails);
 
@@ -104,12 +109,15 @@ function EditProfile({ initialDetails, user }: EditProfileProps): JSX.Element {
     setPreferences(preferences);
     // Since react updates state asynchronously, we need to pass the preferences immediately
     if (!user.filledProfile) {
-      createUserProfile(user.accessToken, user.id, { ...profileDetails, preferences: preferences })
-        .then((updatedProfile) => {
-          if (updatedProfile) {
-            setAllDetails(updatedProfile);
-          }
-        })
+      createUserProfile(user.accessToken, user.id, {
+        ...profileDetails,
+        preferences: preferences,
+      }).then((updatedProfile) => {
+        if (updatedProfile) {
+          setAllDetails(updatedProfile);
+          navigate({ to: '/app', from: '/edit-profile' });
+        }
+      });
     }
   };
 
@@ -130,7 +138,7 @@ function EditProfile({ initialDetails, user }: EditProfileProps): JSX.Element {
 }
 
 export default function EditProfilePage(): JSX.Element {
-  const { user, userProfile } = useUserProfile()
+  const { user, userProfile } = useUserProfile();
 
   return (
     <AuthWrapper>
