@@ -22,6 +22,9 @@ model User {
   likes   User[] @relation("likes")
   likedBy User[] @relation("likes")
 
+  dislikes   User[] @relation("dislikes")
+  dislikedBy User[] @relation("dislikes")
+
   Account Account[]
 
   profile Profile?

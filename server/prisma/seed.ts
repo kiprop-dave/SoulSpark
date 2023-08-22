@@ -1,5 +1,5 @@
 import { createWriteStream } from 'fs'
-import { PrismaClient, Profile } from "@prisma/client";
+import { PrismaClient, Profile, Prisma } from "@prisma/client";
 import { hashPassword } from "../src/utils/password";
 import { imageSchema, Image } from "../src/types";
 import { z } from "zod";
@@ -33,7 +33,7 @@ const lookingForOptions = [
   'Still figuring it out'
 ];
 
-const uploadImage = async (url: string): Promise<Image> => {
+const uploadImage = async (url: string): Promise<Image | null> => {
   const destination = 'https://api.cloudinary.com/v1_1/da1ehipve/image/upload';
   const uploadPreset = 'qfbtmcvf';
   const body = `file=${url}&upload_preset=${uploadPreset}`
@@ -46,18 +46,22 @@ const uploadImage = async (url: string): Promise<Image> => {
       }
     })
     const data = await response.json();
-    const image = imageSchema.parse(data);
-    return image;
+    const image = imageSchema.safeParse(data)
+    if (image.success) {
+      return image.data;
+    } else {
+      return null;
+    };
   } catch (err) {
-    console.log(err);
+    console.log('Error uploading image');
     throw new Error('Error uploading image');
   }
 }
 
 const attractionOptions = ['Man', 'Woman', 'Other', 'All'];
 
-const generateProfile = (user: RandomUser):
-  Pick<Profile, "lookingFor" | "attraction" | "first_name" | "last_name" | "dateOfBirth" | "gender" | "minimumAge" | "maximumAge"> => {
+type GeneratedProfile = Pick<Profile, "lookingFor" | "attraction" | "first_name" | "last_name" | "dateOfBirth" | "gender" | "minimumAge" | "maximumAge">
+const generateProfile = (user: RandomUser): GeneratedProfile => {
   const lookingFor = lookingForOptions[Math.floor(Math.random() * lookingForOptions.length)];
   const attraction = attractionOptions[Math.floor(Math.random() * attractionOptions.length)];
   const minimumAge = Math.floor(Math.random() * 10) + 18;
@@ -75,54 +79,161 @@ const generateProfile = (user: RandomUser):
   }
 }
 
-const fetchRandomUser = async () => {
-  const response = await fetch("https://randomuser.me/api");
-  const data = await response.json();
-  const user = randomUser.parse(data.results[0]);
-  return user;
+const fetchRandomUsers = async (n: number): Promise<RandomUser[]> => {
+  try {
+    const users = await fetch(`https://randomuser.me/api/?results=${n}`);
+    const data = await users.json();
+    let validResults: RandomUser[] = [];
+    data.results.forEach((user: any) => {
+      const parseRes = randomUser.safeParse(user)
+      if (parseRes.success) {
+        validResults.push(parseRes.data);
+      }
+    });
+    return validResults;
+  } catch (err) {
+    console.error('Error fetching random users')
+    throw new Error('Error fetching random users');
+  }
 }
 
 const client = new PrismaClient();
+
+const createUserAndProfile = async (email: string, password: string, profile: GeneratedProfile, images: string[]) => {
+  try {
+    await client.user.create({
+      data: {
+        email: email,
+        password,
+        profile: {
+          create: {
+            ...profile,
+            images: {
+              connect: images.map((id) => ({ id }))
+            }
+          }
+        }
+      }
+    })
+  } catch (err) {
+    if (err instanceof Prisma.PrismaClientKnownRequestError) {
+      console.error("constraint violation", err.message)
+    } else if (err instanceof Prisma.PrismaClientValidationError) {
+      console.error("validation error", err.message)
+    } else if (err instanceof Prisma.PrismaClientInitializationError) {
+      console.error("initialization error", err.message)
+    } else if (err instanceof Prisma.PrismaClientRustPanicError) {
+      console.error("rust panic", err.message)
+    } else if (err instanceof Prisma.PrismaClientUnknownRequestError) {
+      console.error("unknown request error", err.message)
+    } else {
+      console.error('Unknown error creating user and profile')
+      throw new Error('Error creating user and profile');
+    }
+  }
+}
+
+const saveImagesToDb = async (images: Image[]): Promise<string[]> => {
+  try {
+    const results = await Promise.allSettled(images.map(async (image) => {
+      const res = await client.digitalAsset.create({
+        data: image
+      })
+      return res.id;
+    }))
+    return results.map((result) => {
+      if (result.status === 'fulfilled') {
+        return result.value;
+      } else {
+        return null;
+      }
+    }).filter((id) => id !== null) as string[];
+  } catch (err) {
+    console.error('Error saving images to db')
+    throw new Error('Error saving images to db');
+  }
+}
+
+const unsplashRespose = z.object({
+  results: z.array(z.object({
+    urls: z.object({
+      regular: z.string()
+    }).strip()
+  }).strip())
+})
+
+type UnsplashResponse = z.infer<typeof unsplashRespose>;
+
+const fetchUnsplashImages = async (query: string): Promise<UnsplashResponse> => {
+  const destination = `https://api.unsplash.com/search/photos?query=${query}&per_page=20&orientation=portrait`;
+  try {
+    const response = await fetch(destination, {
+      headers: {
+        Authorization: `Client-ID ${process.env.UNSPLASH_ACCESS_KEY}`
+      }
+    });
+    const data = await response.json();
+    const images = unsplashRespose.parse(data);
+    return images;
+  } catch (err) {
+    console.error("error fetching images")
+    throw new Error('Error fetching images');
+  }
+}
+
+const uploadImages = async (imagesUrls: string[]): Promise<Image[]> => {
+  try {
+    const images = await Promise.allSettled(imagesUrls.map(async (url) => {
+      const image = await uploadImage(url);
+      return image;
+    }));
+    const res = images.map((image) => {
+      if (image.status === 'fulfilled') {
+        return image.value;
+      }
+    }).filter((image) => image !== undefined && image !== null) as Image[];
+    return res;
+  } catch (err) {
+    console.error("error uploading images")
+    throw new Error('Error uploading images');
+  }
+}
 
 const seedUsers = async () => {
   const usersCsv = createWriteStream('./users.csv');
   usersCsv.write("email,password\n");
   try {
-    for (let i = 0; i < 100; i++) {
-      const user = await fetchRandomUser();
-      usersCsv.write(`${user.email},${user.login.password}\n`);
-      const password = await hashPassword(user.login.password);
-      const image = await uploadImage(user.picture.medium);
-      const profile = generateProfile(user);
-      await client.user.create({
-        data: {
-          email: user.email,
-          password,
-          profile: {
-            create: {
-              ...profile,
-              images: {
-                create: {
-                  ...image,
-                }
-              }
-            }
-          }
-        },
-        include: {
-          profile: true
-        }
-      })
+    const images1 = await fetchUnsplashImages('black women');
+    const images2 = await fetchUnsplashImages('asian men');
+    const images3 = await fetchUnsplashImages('white women');
+    const images4 = await fetchUnsplashImages('black men');
+    const images = [...images1.results, ...images2.results, ...images3.results, ...images4.results]
+    const imagesUrls = images.map((img) => img.urls.regular);
+    const imagesUploaded = await uploadImages(imagesUrls);
+    const savedImages = await saveImagesToDb(imagesUploaded);
+    const len = savedImages.length;
+    const users = await fetchRandomUsers(20);
+    for (let i = 0; i < users.length; i++) {
+      try {
+        const user = users[i];
+        const password = await hashPassword(user.login.password);
+        const profile = generateProfile(user);
+        const imagesIds = savedImages.slice(i * 4, i * 4 + 4);
+        await createUserAndProfile(user.email, password, profile, imagesIds);
+        usersCsv.write(`${user.email},${user.login.password}\n`);
+      } catch (err) {
+        console.log(err);
+        continue;
+      }
     }
     usersCsv.end();
   } catch (err) {
-    console.log(err);
+    throw new Error('Error seeding users');
   }
 }
 
 seedUsers().then(async () => {
   await client.$disconnect();
-}).catch(async (err) => {
-  console.log(err);
+}).finally(async () => {
   await client.$disconnect();
 });
