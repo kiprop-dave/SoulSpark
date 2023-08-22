@@ -19,11 +19,16 @@ export const useImagesCarousel = (imagesNumber: number) => {
     }
   };
 
+  const reset = () => {
+    setCurrentIndex(0);
+  };
+
   return {
     currentIndex,
     nextImage,
     previousImage,
     atStart,
     atEnd,
+    reset,
   };
 };
