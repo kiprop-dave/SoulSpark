@@ -22,27 +22,8 @@ export function ImagesCarousel({
   atEnd,
 }: ImagesCarouselProps): JSX.Element {
   const [hovered, setHovered] = useState(false);
-  const [imageSrc, setImageSrc] = useState('');
-  const [loading, setLoading] = useState(true);
 
   const currentImage = useMemo(() => images[index], [index, images]);
-
-  useEffect(() => {
-    let objectUrl: string | null = null;
-    fetch(currentImage.url).then((res) =>
-      res.blob().then((blob) => {
-        objectUrl = URL.createObjectURL(blob);
-        setImageSrc(objectUrl);
-        setLoading(false);
-      })
-    );
-
-    return () => {
-      if (objectUrl) {
-        URL.revokeObjectURL(objectUrl);
-      }
-    };
-  }, [currentImage.url]);
 
   return (
     <ErrorBoundary fallback={<p>Something went wrong</p>}>
@@ -85,28 +66,39 @@ export function ImagesCarousel({
           </button>
         </div>
         <div className="w-full h-full flex items-center justify-center">
-          <ImageView src={imageSrc} loading={loading} />
+          <ImageView src={currentImage.secure_url} />
         </div>
       </div>
     </ErrorBoundary>
   );
 }
 
-function ImageView({ src, loading }: { src: string; loading: boolean }): JSX.Element {
-  console.log(loading);
+function ImageView({ src }: { src: string }): JSX.Element {
+  const [imageSrc, setImageSrc] = useState(src);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    setLoading(true);
+    setImageSrc(src);
+  }, [src]);
+
 
   return (
     <div className="w-full h-full flex items-center justify-center">
-      <p
-        className={clsx('text-2xl', {
-          hidden: !loading,
+      <div
+        className={clsx('w-12 h-12 border-8 border-t-red-500 border-l-red-500 border-b-red-500 border-r-white rounded-full animate-spin', {
+          hidden: !loading
         })}
       >
-        Loading...
-      </p>
-      {!loading && src.length > 0 && (
-        <img src={src} alt="user image" className="w-full h-full object-cover rounded-lg" />
-      )}
+      </div>
+
+      <img src={imageSrc} alt="user image" className={clsx("w-full h-full object-cover rounded-lg transition-opacity duration-300", {
+        hidden: loading,
+        'opacity-0': loading,
+        'opacity-100': !loading
+      })}
+        onLoad={() => setLoading(false)}
+      />
     </div>
   );
 }
