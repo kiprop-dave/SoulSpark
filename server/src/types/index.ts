@@ -29,7 +29,7 @@ export type GoogleUserInfo = z.infer<typeof googleUserInfoSchema>;
 
 export const userCredentialsSchema = z.object({
   email: z.string().email(),
-  password: z.string().min(5),// TODO:Change to 8 in production
+  password: z.string().min(5), // TODO:Change to 8 in production
 });
 
 export type UserCredentials = z.infer<typeof userCredentialsSchema>;
@@ -84,11 +84,32 @@ export type PersonalInfo = z.infer<typeof personalInfoSchema>;
 
 export const basicInfoSchema = z
   .object({
-    bio: z.string().max(500).optional().nullable().transform((val) => val || ''),
-    languages: z.array(z.string()).optional().nullable().transform((val) => val || []),
-    zodiac: z.string().optional().nullable().transform((val) => val || ''),
-    education: z.string().optional().nullable().transform((val) => val || ''),
-    occupation: z.string().optional().nullable().transform((val) => val || ''),
+    bio: z
+      .string()
+      .max(500)
+      .optional()
+      .nullable()
+      .transform((val) => val || ''),
+    languages: z
+      .array(z.string())
+      .optional()
+      .nullable()
+      .transform((val) => val || []),
+    zodiac: z
+      .string()
+      .optional()
+      .nullable()
+      .transform((val) => val || ''),
+    education: z
+      .string()
+      .optional()
+      .nullable()
+      .transform((val) => val || ''),
+    occupation: z
+      .string()
+      .optional()
+      .nullable()
+      .transform((val) => val || ''),
   })
   .strip();
 
@@ -96,12 +117,36 @@ export type BasicInfo = z.infer<typeof basicInfoSchema>;
 
 export const otherInfoSchema = z
   .object({
-    interests: z.array(z.string()).optional().nullable().transform((val) => val || []),
-    diet: z.string().optional().nullable().transform((val) => val || ''),
-    drinking: z.string().optional().nullable().transform((val) => val || ''),
-    smoking: z.string().optional().nullable().transform((val) => val || ''),
-    pets: z.string().optional().nullable().transform((val) => val || ''),
-    socialMediaActivity: z.string().optional().nullable().transform((val) => val || ''),
+    interests: z
+      .array(z.string())
+      .optional()
+      .nullable()
+      .transform((val) => val || []),
+    diet: z
+      .string()
+      .optional()
+      .nullable()
+      .transform((val) => val || ''),
+    drinking: z
+      .string()
+      .optional()
+      .nullable()
+      .transform((val) => val || ''),
+    smoking: z
+      .string()
+      .optional()
+      .nullable()
+      .transform((val) => val || ''),
+    pets: z
+      .string()
+      .optional()
+      .nullable()
+      .transform((val) => val || ''),
+    socialMediaActivity: z
+      .string()
+      .optional()
+      .nullable()
+      .transform((val) => val || ''),
   })
   .strip();
 
@@ -128,3 +173,20 @@ export const userProfileSchema = z.object({
 });
 
 export type UserProfile = z.infer<typeof userProfileSchema>;
+
+export const possibleMatchSchema = z.object({
+  userId: z.string(),
+  profile: z.object({
+    personalInfo: personalInfoSchema,
+    basicInfo: basicInfoSchema.optional(),
+    otherInfo: otherInfoSchema.optional(),
+  }),
+});
+
+export type PossibleMatch = z.infer<typeof possibleMatchSchema>;
+
+export const matchSchema = possibleMatchSchema.extend({
+  conversationId: z.string(),
+});
+
+export type Match = z.infer<typeof matchSchema>;

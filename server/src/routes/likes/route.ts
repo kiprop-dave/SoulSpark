@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { verifyAccessTokenMiddleware } from '../../middleware/verifyAccessToken';
 import { getSession } from '../../utils/session';
-import { getNumberOfLikes } from '../../controllers/likes';
+import { getLikesTeaser } from '../../controllers/likes';
 
 const likesRouter = Router();
 likesRouter.use(verifyAccessTokenMiddleware);
@@ -12,11 +12,12 @@ likesRouter.route('/').get(async (req, res) => {
   if (!session) {
     return res.status(401).send('Unauthorized');
   }
-  const result = await getNumberOfLikes(session.id);
+  const result = await getLikesTeaser(session.id);
   if (result.status === 'error') {
     return res.status(500).send('Internal Server Error');
   }
-  return res.status(200).json({ likes: result.data.likes });
+  const { likes, latestLike } = result.data;
+  return res.status(200).json({ likes, latestLike });
 });
 
 export { likesRouter };

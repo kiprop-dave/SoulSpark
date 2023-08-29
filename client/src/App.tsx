@@ -2,21 +2,24 @@ import { Outlet, RouterProvider, RootRoute, Route, Router } from '@tanstack/rout
 import { AuthProvider } from './context/AuthContext';
 import { UserProfileProvider } from './context/UserProfileContext';
 import { ThemeProvider, useTheme } from './context/ThemeContext';
+import { PossibleMatchesProvider } from './context/PossibleMatchesContext';
 import LoginPage from './pages/Login/page';
 import FillProfilePage from './pages/FillProfile/page';
 import { AppPageLayout } from './pages/App/layout';
 import AppPage from './pages/App/page';
 import ProfilePage from './pages/App/Profile/page';
-import { LikesPage } from './pages/App/Likes/page';
+import LikesPage from './pages/App/Likes/page';
 import { MessagesPage } from './pages/App/Messages/page';
+import { ConversationPage } from './pages/App/Messages/[conversationId]';
 import AuthWrapper from './components/wrappers/AuthWrapper';
 
 const rootRoute = new RootRoute({
   component: () => {
     const { theme } = useTheme();
-    console.log(theme);
     return (
-      <main className={`w-screen h-screen flex items-center justify-center font-sans ${theme}`}>
+      <main
+        className={`w-screen h-screen flex items-center delay-100 justify-center font-sans ${theme}`}
+      >
         <Outlet />
       </main>
     );
@@ -42,7 +45,9 @@ const appRoute = new Route({
     return (
       <AuthWrapper>
         <AppPageLayout>
-          <Outlet />
+          <PossibleMatchesProvider>
+            <Outlet />
+          </PossibleMatchesProvider>
         </AppPageLayout>
       </AuthWrapper>
     );
@@ -67,16 +72,34 @@ const matchesRoute = new Route({
   component: LikesPage,
 });
 
-const messagesRoute = new Route({
+const messagesIndexRoute = new Route({
   getParentRoute: () => appRoute,
   path: '/messages',
+  component: () => {
+    return (
+      <>
+        <Outlet />
+      </>
+    )
+  },
+});
+
+const messagesRoute = new Route({
+  getParentRoute: () => messagesIndexRoute,
+  path: '/',
   component: MessagesPage,
+});
+
+const conversationRoute = new Route({
+  getParentRoute: () => messagesIndexRoute,
+  path: '$conversationId',
+  component: ConversationPage,
 });
 
 const appRouteTree = appRoute.addChildren([
   appIndexRoute,
   matchesRoute,
-  messagesRoute,
+  messagesIndexRoute.addChildren([messagesRoute, conversationRoute]),
   profileRoute,
 ]);
 
