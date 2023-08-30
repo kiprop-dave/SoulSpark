@@ -80,7 +80,7 @@ const messagesIndexRoute = new Route({
       <>
         <Outlet />
       </>
-    )
+    );
   },
 });
 

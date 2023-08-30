@@ -6,6 +6,9 @@ import cookieParser from 'cookie-parser';
 import authRouter from './routes/auth';
 import oauthCallbackRouter from './routes/oauthCallback';
 import usersRouter from './routes/users/users';
+import { matchesRouter } from './routes/matches/matches';
+import { likesRouter } from './routes/likes/route';
+import { conversationRouter } from './routes/conversations/route';
 import { env } from './lib/env';
 import { appConstants } from './utils/constants';
 
@@ -34,6 +37,9 @@ app.use(express.urlencoded({ extended: true }));
 app.use('/auth', authRouter);
 app.use('/oauth/callback', oauthCallbackRouter);
 app.use('/users', usersRouter);
+app.use('/matches', matchesRouter);
+app.use('/likes', likesRouter);
+app.use('/conversations', conversationRouter);
 
 app.use('*', (_, res) => {
   return res.status(404).send('Not found');

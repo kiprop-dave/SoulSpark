@@ -13,9 +13,9 @@ datasource db {
 model User {
   id            String   @id @default(uuid())
   email         String   @unique
-  emailVerified Boolean  @default(false)
+  emailVerified Boolean  @default(false) @map("email_verified")
   password      String?  @db.VarChar(255)
-  createdAt     DateTime @default(now())
+  createdAt     DateTime @default(now()) @map("created_at")
 
   // A user can like many users and be liked by many users
   // When two users like each other, they are matched and can start a conversation
@@ -33,14 +33,16 @@ model User {
 
   Message Message[]
 
+  seenMessages Message[] @relation("seenBy")
+
   @@map("users")
 }
 
 model Account {
   id         String        @id @default(uuid())
-  providerId String
+  providerId String        @map("provider_id")
   provider   OauthProvider
-  userId     String
+  userId     String        @map("user_id")
   user       User          @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerId])
@@ -56,7 +58,7 @@ model Profile {
   id                  String         @id @default(uuid())
   first_name          String         @db.VarChar(50)
   last_name           String         @db.VarChar(50)
-  dateOfBirth         DateTime
+  dateOfBirth         DateTime       @map("date_of_birth")
   gender              Gender
   images              DigitalAsset[]
   bio                 String?
@@ -69,14 +71,14 @@ model Profile {
   drinking            String?        @db.VarChar(50)
   smoking             String?        @db.VarChar(50)
   pets                String?        @db.VarChar(50)
-  socialMediaActivity String?        @db.VarChar(50)
+  socialMediaActivity String?        @map("social_media_activity") @db.VarChar(50)
   socials             String[]
-  lookingFor          String         @db.VarChar(150)
+  lookingFor          String         @map("looking_for") @db.VarChar(150)
   attraction          String         @db.VarChar(50)
-  minimumAge          Int
-  maximumAge          Int
+  minimumAge          Int            @map("minimum_age")
+  maximumAge          Int            @map("maximum_age")
 
-  userId String @unique
+  userId String @unique @map("user_id")
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("profiles")
@@ -91,7 +93,7 @@ enum Gender {
 
 model Conversation {
   id        String   @id @default(uuid())
-  createdAt DateTime @default(now())
+  createdAt DateTime @default(now()) @map("created_at")
 
   participants User[]    @relation("conversationMembership")
   messages     Message[]
@@ -101,16 +103,18 @@ model Conversation {
 
 model Message {
   id        String   @id @default(uuid())
-  createdAt DateTime @default(now())
+  createdAt DateTime @default(now()) @map("created_at")
   text      String?
 
-  senderId String
+  seenBy User[] @relation("seenBy")
+
+  senderId String @map("sender_id")
   sender   User?  @relation(fields: [senderId], references: [id], onDelete: Cascade)
 
   attachment DigitalAsset?
 
   Conversation   Conversation? @relation(fields: [conversationId], references: [id], onDelete: Cascade)
-  conversationId String
+  conversationId String        @map("conversation_id")
 
   @@map("messages")
 }
@@ -126,10 +130,10 @@ model DigitalAsset {
   url           String   @db.VarChar(255)
   secure_url    String   @db.VarChar(255)
 
-  profileId String?
+  profileId String?  @map("profile_id")
   profile   Profile? @relation(fields: [profileId], references: [id], onDelete: Cascade)
 
-  messageId String?  @unique
+  messageId String?  @unique @map("message_id")
   message   Message? @relation(fields: [messageId], references: [id], onDelete: Cascade)
 
   @@map("digital_assets")
