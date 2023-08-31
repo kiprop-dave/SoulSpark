@@ -1,4 +1,4 @@
-import { useReducer, useState } from 'react';
+import { useState } from 'react';
 import { UserProfile, PersonalInfo, BasicInfo, OtherInfo, Preferences } from '@/types';
 
 export function useProfileDetails() {

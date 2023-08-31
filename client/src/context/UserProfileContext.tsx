@@ -7,6 +7,7 @@ type UserProfileContextType = {
   userProfile: UserProfile | null;
   updateProfile: (profile: UserProfile) => void;
   user: LoggedInUser | null;
+  loading: boolean;
 };
 
 const UserProfileContext = createContext<UserProfileContextType | null>(null);
@@ -14,13 +15,18 @@ const UserProfileContext = createContext<UserProfileContextType | null>(null);
 export function UserProfileProvider({ children }: { children: React.ReactNode }) {
   const { user } = useAuth();
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
+  const [loading, setLoading] = useState<boolean>(false);
 
   useEffect(() => {
     if (user) {
-      getUserProfile(user.id, user.accessToken).then((res) => {
-        console.log(res);
-        setUserProfile(res);
-      });
+      setLoading(true);
+      getUserProfile(user.id, user.accessToken)
+        .then((res) => {
+          setUserProfile(res);
+        })
+        .finally(() => {
+          setLoading(false);
+        });
     }
   }, [user]);
 
@@ -32,6 +38,7 @@ export function UserProfileProvider({ children }: { children: React.ReactNode })
     userProfile,
     updateProfile,
     user,
+    loading,
   };
 
   return <UserProfileContext.Provider value={value}>{children}</UserProfileContext.Provider>;

@@ -1,4 +1,4 @@
-import { useUserProfile } from "@/context/UserProfileContext";
+import { useUserProfile } from '@/context/UserProfileContext';
 
 export function Waiting(): JSX.Element {
   const { userProfile } = useUserProfile();
@@ -15,5 +15,5 @@ export function Waiting(): JSX.Element {
         />
       </div>
     </div>
-  )
+  );
 }

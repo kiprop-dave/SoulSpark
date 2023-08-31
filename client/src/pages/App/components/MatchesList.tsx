@@ -1,43 +1,39 @@
 import { useState } from 'react';
 import clsx from 'clsx';
-import { Link } from '@tanstack/router'
+import { Link } from '@tanstack/router';
 import { useLikesTeaser } from '@/context/LikesContext';
 import { useMatches } from '@/context/MatchesContext';
 import { Match as MatchType } from '@/types';
 
-interface MatchesListProps { }
+interface MatchesListProps {}
 
-export function MatchesList({ }: MatchesListProps): JSX.Element {
+export function MatchesList({}: MatchesListProps): JSX.Element {
   const { likesTeaser, loading } = useLikesTeaser();
   const { likes } = likesTeaser;
   const { matches } = useMatches();
   return (
     <section className="flex gap-4 p-2 w-full overflow-scroll no-scrollbar md:grid md:grid-cols-2 lg:grid-cols-3 md:gap-3 lg:gap-6 md:h-[92%]">
       <Link
-        to='/app/likes'
-        from='/app/messages'
-        className={clsx('flex items-center justify-center p-1 ring ring-orange-400 h-32 rounded relative min-w-[6rem] md:w-auto', {
-          hidden: loading || likes === 0,
-        })}
+        to="/app/likes"
+        from="/app/messages"
+        className={clsx(
+          'flex items-center justify-center p-1 ring ring-orange-400 h-32 rounded relative min-w-[6rem] md:w-auto',
+          {
+            hidden: loading || likes === 0,
+          }
+        )}
       >
         <div className="w-10 h-10 rounded-full flex items-center justify-center shadow-inner bg-orange-400">
           <span className="text-xl font-bold">{likes}</span>
         </div>
         <div className="absolute flex bottom-1 left-2">
           <p className="text-sm font-bold text-center text-white">
-            {
-              likes === 1 ? `${likes} Like` : `${likes} Likes`
-            }
+            {likes === 1 ? `${likes} Like` : `${likes} Likes`}
           </p>
         </div>
       </Link>
       {matches.map((match, i) => {
-        return (
-          <Match
-            key={i}
-            match={match}
-          />
-        );
+        return <Match key={i} match={match} />;
       })}
     </section>
   );
@@ -54,10 +50,11 @@ function Match({ match }: MatchProps): JSX.Element {
 
   return (
     <Link
-      to='/app/messages/$conversationId'
-      from='/app/messages'
+      to="/app/messages/$conversationId"
+      from="/app/messages"
       params={{ conversationId: to }}
-      className="flex flex-col items-center justify-center w-12 h-32 rounded min-w-[5rem] md:w-auto transform transition-transform hover:scale-105">
+      className="flex flex-col items-center justify-center w-12 h-32 rounded min-w-[5rem] md:w-auto transform transition-transform hover:scale-105"
+    >
       <div
         className={clsx(
           'w-5 h-5 border-4 border-t-red-500 border-l-red-500 border-b-red-500 border-r-white rounded-full animate-spin',
@@ -77,6 +74,5 @@ function Match({ match }: MatchProps): JSX.Element {
         onLoad={() => setLoading(false)}
       />
     </Link>
-  )
+  );
 }
-

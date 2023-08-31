@@ -19,7 +19,7 @@ export const useImagesCarousel = (imagesNumber: number) => {
     }
   };
 
-  const reset = () => {
+  const resetIndex = () => {
     setCurrentIndex(0);
   };
 
@@ -29,6 +29,6 @@ export const useImagesCarousel = (imagesNumber: number) => {
     previousImage,
     atStart,
     atEnd,
-    reset,
+    resetIndex,
   };
 };

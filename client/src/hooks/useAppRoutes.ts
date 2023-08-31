@@ -42,7 +42,7 @@ export function useAppRoutes() {
         path: '/app/messages',
         name: 'Messages',
         icon: AiFillMessage,
-        isActive: location === '/messages',
+        isActive: location.startsWith('/messages'),
       },
       {
         path: '/app/profile',

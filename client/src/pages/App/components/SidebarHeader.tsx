@@ -1,4 +1,5 @@
 import { Link, ToPathOption } from '@tanstack/router';
+import Logo from '@/assets/logo.svg';
 import { useAppRoutes } from '@/hooks/useAppRoutes';
 import { PersonalInfo } from '@/types';
 
@@ -10,7 +11,7 @@ export function SideBarHeader({ personalInfo }: SidebarHeaderProps): JSX.Element
   const { location } = useAppRoutes();
 
   // Toggles between /app/profile and /app
-  const toLocation: ToPathOption = location === '/' || location === '' ? '/app/profile' : '/app';
+  const toLocation: ToPathOption = location === '/profile' ? '/app' : '/app/profile';
 
   return (
     <div className="flex items-center w-full h-[14%] px-4 py-5 bg-gradient-to-tr from-red-500 to-orange-300">
@@ -20,7 +21,7 @@ export function SideBarHeader({ personalInfo }: SidebarHeaderProps): JSX.Element
       >
         <div className="bg-white rounded-full">
           <img
-            src={personalInfo?.images[0].secure_url}
+            src={location === '/profile' ? Logo : personalInfo?.images[0].secure_url}
             className="w-8 h-8 rounded-full object-cover"
             alt="display picture"
           />

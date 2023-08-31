@@ -7,18 +7,21 @@ import {
   BiSolidRightArrowSquare,
   BiSpaceBar,
 } from 'react-icons/bi';
+import { BsInfo } from 'react-icons/bs';
 import { ImCross } from 'react-icons/im';
 import { AiFillHeart } from 'react-icons/ai';
 import { usePossibleMatches } from '@/context/PossibleMatchesContext';
 import { useImagesCarousel } from '@/hooks/useImagesCarousel';
 import { ImagesCarousel } from './ImagesCarousel';
 import { NameAge } from './UserInfo';
+import { Waiting } from './Waiting';
 
 interface SwipeProps {}
 
 export function Swipe({}: SwipeProps): JSX.Element {
   const [showControls, setShowControls] = useState<boolean>(true);
   //const [isMatch, setIsMatch] = useState<boolean>(false);
+  const [showProfile, setShowProfile] = useState<boolean>(false);
   const swipeRef = useRef<HTMLDivElement | null>(null);
   const { next, possibleMatches, atEnd, index } = usePossibleMatches();
 
@@ -30,7 +33,7 @@ export function Swipe({}: SwipeProps): JSX.Element {
     previousImage,
     atStart,
     atEnd: end,
-    reset,
+    resetIndex,
   } = useImagesCarousel(currentMatch?.profile.personalInfo.images?.length || 0);
 
   useEffect(() => {
@@ -72,7 +75,7 @@ export function Swipe({}: SwipeProps): JSX.Element {
 
   const likeHandler = () => {
     next({ action: 'like', userId: currentMatch.userId });
-    reset();
+    resetIndex();
   };
 
   const clickControls = useMemo(
@@ -108,94 +111,113 @@ export function Swipe({}: SwipeProps): JSX.Element {
         break;
       case 'ArrowUp':
         //Open profile;
+        setShowProfile(true);
         break;
       case 'ArrowDown':
         //Close profile;
+        setShowProfile(false);
         break;
       case ' ':
         //Next photo;
-
+        nextImage();
         break;
       default:
         break;
     }
   };
 
-  if (atEnd)
-    return <div className="w-full h-full flex items-center justify-center">No more matches</div>;
+  if (atEnd) {
+    return <Waiting />;
+  }
 
   return (
-    <div
-      className="w-full h-full flex flex-col items-center md:pt-1"
-      onKeyDown={handleKeyPress}
-      tabIndex={0}
-      ref={swipeRef}
-    >
-      <div className="w-full md:w-[38%] h-full rounded-xl md:h-[92%] md:shadow-lg md:shadow-slate-300 dark:bg-neutral-800 dark:shadow-black">
-        <div className="w-full h-[85%] relative">
-          <ImagesCarousel
-            images={currentMatch.profile.personalInfo.images}
-            index={currentIndex}
-            next={nextImage}
-            previous={previousImage}
-            atStart={atStart}
-            atEnd={end}
-          />
-          <div className="absolute bottom-3 left-2">
-            <NameAge
-              first_name={currentMatch.profile.personalInfo.first_name}
-              dateOfBirth={currentMatch.profile.personalInfo.dateOfBirth}
+    <>
+      <div
+        className="w-full h-full flex flex-col items-center md:pt-1"
+        onKeyDown={handleKeyPress}
+        tabIndex={0}
+        ref={swipeRef}
+      >
+        <div className="w-full md:w-[38%] h-full rounded-xl md:h-[92%] md:shadow-lg md:shadow-slate-300 dark:bg-neutral-800 dark:shadow-black overflow-y-scroll no-scrollbar">
+          <div className="w-full h-[85%] relative">
+            <ImagesCarousel
+              images={currentMatch.profile.personalInfo.images}
+              index={currentIndex}
+              next={nextImage}
+              previous={previousImage}
+              atStart={atStart}
+              atEnd={end}
             />
-          </div>
-        </div>
-        <div className="w-full h-[15%] rounded-b-xl bg-neutral-950 flex items-center justify-evenly">
-          {clickControls.map(({ icon: Icon, text, color, onClick }, i) => {
-            return (
+            <div className="absolute bottom-3 left-2 w-[95%] flex items-center justify-between">
+              <NameAge
+                first_name={currentMatch.profile.personalInfo.first_name}
+                dateOfBirth={currentMatch.profile.personalInfo.dateOfBirth}
+              />
               <button
-                key={i}
                 type="button"
-                onClick={() => onClick()}
-                className={clsx(`text-3xl border rounded-full p-4`, {
-                  'border-red-500 text-red-500': color === 'red',
-                  'border-green-500 text-green-500': color === 'green',
-                })}
+                onClick={() => setShowProfile(!showProfile)}
+                className="bg-white rounded-full"
               >
-                <p className="sr-only">{text}</p>
-                <Icon
-                  className={clsx('transform transition-transform hover:scale-110', {
-                    'text-red-500': color === 'red',
-                    'text-green-500': color === 'green',
-                  })}
-                />
+                <BsInfo className="text-black text-2xl" />
               </button>
-            );
-          })}
-        </div>
-      </div>
-      <div className="hidden md:flex items-center justify-center w-full h-10 mt-auto">
-        <button
-          type="button"
-          onClick={() => setShowControls(!showControls)}
-          className="bg-slate-700 text-white font-semibold text-sm px-3 py-1 rounded-2xl hover:bg-slate-900 w-16"
-        >
-          {showControls === true ? 'Hide' : 'Show'}
-        </button>
-        {showControls && (
-          <div className="flex items-center gap-4 ml-2">
-            {keyboardControls.map(({ icon: Icon, text }, i) => {
+            </div>
+          </div>
+          <div
+            className={clsx('', {
+              hidden: !showProfile,
+            })}
+          >
+            Show profile details here
+          </div>
+          <div className="w-full h-[15%] rounded-b-xl bg-neutral-950 flex items-center justify-evenly">
+            {clickControls.map(({ icon: Icon, text, color, onClick }, i) => {
               return (
-                <div
+                <button
                   key={i}
-                  className="flex items-center gap-1 text-slate-800 h-10 dark:text-slate-300"
+                  type="button"
+                  onClick={() => onClick()}
+                  className={clsx(`text-3xl border rounded-full p-4`, {
+                    'border-red-500 text-red-500': color === 'red',
+                    'border-green-500 text-green-500': color === 'green',
+                  })}
                 >
-                  <Icon />
-                  <p className="font-semibold tracking-wider">{text}</p>
-                </div>
+                  <p className="sr-only">{text}</p>
+                  <Icon
+                    className={clsx('transform transition-transform hover:scale-110', {
+                      'text-red-500': color === 'red',
+                      'text-green-500': color === 'green',
+                    })}
+                  />
+                </button>
               );
             })}
           </div>
-        )}
+        </div>
+        <div className="hidden md:flex items-center justify-center w-full h-10 mt-auto">
+          <button
+            type="button"
+            onClick={() => setShowControls(!showControls)}
+            className="bg-slate-700 text-white font-semibold text-sm px-3 py-1 rounded-2xl hover:bg-slate-900 w-16"
+          >
+            {showControls === true ? 'Hide' : 'Show'}
+          </button>
+          {showControls && (
+            <div className="flex items-center gap-4 ml-2">
+              {keyboardControls.map(({ icon: Icon, text }, i) => {
+                return (
+                  <div
+                    key={i}
+                    className="flex items-center gap-1 text-slate-800 h-10 dark:text-slate-300"
+                  >
+                    <Icon />
+                    <p className="font-semibold tracking-wider">{text}</p>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
       </div>
-    </div>
+    </>
   );
 }

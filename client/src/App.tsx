@@ -10,8 +10,9 @@ import AppPage from './pages/App/page';
 import ProfilePage from './pages/App/Profile/page';
 import LikesPage from './pages/App/Likes/page';
 import { MessagesPage } from './pages/App/Messages/page';
-import { ConversationPage } from './pages/App/Messages/[conversationId]';
+import ConversationPage from './pages/App/Messages/[conversationId]/page';
 import AuthWrapper from './components/wrappers/AuthWrapper';
+import MobileHeader from './components/MobileHeader';
 
 const rootRoute = new RootRoute({
   component: () => {
@@ -57,19 +58,40 @@ const appRoute = new Route({
 const appIndexRoute = new Route({
   getParentRoute: () => appRoute,
   path: '/',
-  component: AppPage,
+  component: () => {
+    return (
+      <>
+        <MobileHeader />
+        <AppPage />
+      </>
+    );
+  },
 });
 
 const profileRoute = new Route({
   getParentRoute: () => appRoute,
   path: '/profile',
-  component: ProfilePage,
+  component: () => {
+    return (
+      <>
+        <MobileHeader />
+        <ProfilePage />
+      </>
+    );
+  },
 });
 
 const matchesRoute = new Route({
   getParentRoute: () => appRoute,
   path: '/likes',
-  component: LikesPage,
+  component: () => {
+    return (
+      <>
+        <MobileHeader />
+        <LikesPage />
+      </>
+    );
+  },
 });
 
 const messagesIndexRoute = new Route({
@@ -87,7 +109,14 @@ const messagesIndexRoute = new Route({
 const messagesRoute = new Route({
   getParentRoute: () => messagesIndexRoute,
   path: '/',
-  component: MessagesPage,
+  component: () => {
+    return (
+      <>
+        <MobileHeader />
+        <MessagesPage />
+      </>
+    );
+  },
 });
 
 const conversationRoute = new Route({

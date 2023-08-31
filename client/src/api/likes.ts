@@ -1,23 +1,26 @@
 import { z } from 'zod';
 import { api } from './base';
 
-const likesNumberResponseSchema = z.object({
+const likesTeaserResponseSchema = z.object({
   likes: z.number(),
+  latestLike: z.object({
+    first_name: z.string(),
+  }),
 });
 
-type LikesNumberResponse = z.infer<typeof likesNumberResponseSchema>;
+export type LikesTeaserResponse = z.infer<typeof likesTeaserResponseSchema>;
 
-type GetUserLikesNumberResult =
-  | { status: 'success'; data: LikesNumberResponse }
+type GetUserLikesTeaserResult =
+  | { status: 'success'; data: LikesTeaserResponse }
   | { status: 'error'; error: 'Unauthorized' | 'NetworkError' | 'UnknownError' };
-export const getUserLikesNumber = async (token: string): Promise<GetUserLikesNumberResult> => {
+export const getUserLikesTeaser = async (token: string): Promise<GetUserLikesTeaserResult> => {
   try {
     const res = await api.get('/likes', {
       headers: {
         Authorization: `Bearer ${token}`,
       },
     });
-    const data = likesNumberResponseSchema.parse(res.data);
+    const data = likesTeaserResponseSchema.parse(res.data);
     return { status: 'success', data };
   } catch (err) {
     // TODO: Handle error

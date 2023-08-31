@@ -102,3 +102,28 @@ export const userProfileSchema = z.object({
 });
 
 export type UserProfile = z.infer<typeof userProfileSchema>;
+
+export const possibleMatchSchema = z.object({
+  userId: z.string(),
+  profile: z.object({
+    personalInfo: personalInfoSchema,
+    basicInfo: basicInfoSchema.optional(),
+    otherInfo: otherInfoSchema.optional(),
+  }),
+});
+
+export type PossibleMatch = z.infer<typeof possibleMatchSchema>;
+
+export const matchSchema = possibleMatchSchema.extend({
+  conversationId: z.string(),
+});
+
+export type Match = z.infer<typeof matchSchema>;
+
+export const likeResponseSchema = z.object({
+  isMatch: z.boolean(),
+  conversationId: z.string().optional(),
+  matchedAt: z.date().optional(),
+});
+
+export type LikeResponse = z.infer<typeof likeResponseSchema>;

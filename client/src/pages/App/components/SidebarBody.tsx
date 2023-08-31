@@ -5,11 +5,11 @@ import { MatchesList } from './MatchesList';
 import { MessagesList } from './MessagesList';
 import { Settings } from './Settings';
 
-interface SidebarBodyProps { }
+interface SidebarBodyProps {}
 
 type SidebarTab = 'Matches' | 'Messages';
 
-export function SidebarBody({ }: SidebarBodyProps): JSX.Element {
+export function SidebarBody({}: SidebarBodyProps): JSX.Element {
   const { location } = useAppRoutes();
 
   return (
@@ -23,8 +23,8 @@ export function SidebarBody({ }: SidebarBodyProps): JSX.Element {
   );
 }
 
-interface MatchesMessagesProps { }
-function MatchesMessages({ }: MatchesMessagesProps): JSX.Element {
+interface MatchesMessagesProps {}
+function MatchesMessages({}: MatchesMessagesProps): JSX.Element {
   const [activeTab, setActiveTab] = useState<SidebarTab>('Matches');
 
   return (
@@ -62,8 +62,8 @@ function MatchesMessages({ }: MatchesMessagesProps): JSX.Element {
   );
 }
 
-interface ProfileSettingsProps { }
-function ProfileSettings({ }: ProfileSettingsProps): JSX.Element {
+interface ProfileSettingsProps {}
+function ProfileSettings({}: ProfileSettingsProps): JSX.Element {
   return (
     <div className="w-full h-full flex flex-col bg-slate-100 dark:bg-neutral-950">
       <Settings />

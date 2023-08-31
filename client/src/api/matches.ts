@@ -1,8 +1,15 @@
 import axios from 'axios';
 import { api } from './base';
-import { possibleMatchSchema, PossibleMatch, likeResponseSchema, LikeResponse, Match, matchSchema } from '@/types';
+import {
+  possibleMatchSchema,
+  PossibleMatch,
+  likeResponseSchema,
+  LikeResponse,
+  Match,
+  matchSchema,
+} from '@/types';
 
-type PossibleError = 'unauthorized' | 'serverError' | 'unknownError';
+export type PossibleError = 'unauthorized' | 'serverError' | 'unknownError';
 type getPossibleMatchesResult =
   | { status: 'success'; data: PossibleMatch[] }
   | { status: 'error'; error: PossibleError };
@@ -90,7 +97,9 @@ export const dislikeMatch = async (token: string, matchId: string): Promise<Disl
   }
 };
 
-type getMatchesResult = { status: 'success'; data: Match[] } | { status: 'error'; error: PossibleError };
+type getMatchesResult =
+  | { status: 'success'; data: Match[] }
+  | { status: 'error'; error: PossibleError };
 export const getMatches = async (token: string): Promise<getMatchesResult> => {
   try {
     const response = await api.get('/matches', {
