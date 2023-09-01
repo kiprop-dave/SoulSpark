@@ -8,6 +8,7 @@ import { useConversations } from '@/context/ConversationsContext';
 import { useAppRoutes } from '@/hooks/useAppRoutes';
 import UserAvatar from '@/pages/App/components/UserAvatar';
 import NoMessages from './components/NoMessages';
+import MessageInput from './components/MessageInput';
 
 export default function ConversationPage(): JSX.Element {
   const { user } = useAuth();
@@ -43,7 +44,7 @@ export default function ConversationPage(): JSX.Element {
             </div>
           </div>
         </div>
-        <nav className="flex items-center w-full h-12 px-2 border-b border-slate-300 dark:border-gray-700 md:hidden">
+        <nav className="flex items-center w-full h-[8%] px-2 border-b border-slate-300 dark:border-gray-700 md:hidden">
           <Link to="/app/messages" from="/app/messages/$conversationId">
             <IoChevronBack className="w-8 h-8 text-slate-700 dark:text-slate-300" />
           </Link>
@@ -56,7 +57,7 @@ export default function ConversationPage(): JSX.Element {
             </p>
           </div>
         </nav>
-        <div className="h-[74%]">
+        <div className="h-[80%] md:h-[74%]">
           {conversation.messages.length > 0 ? (
             <div>Messages Box</div>
           ) : (
@@ -69,7 +70,9 @@ export default function ConversationPage(): JSX.Element {
             </div>
           )}
         </div>
-        <div className="h-[12%] border-t border-slate-300 dark:border-gray-700">Message Box</div>
+        <div className="h-[12%] md:h-[12%] w-full border-t border-slate-300 dark:border-gray-700">
+          <MessageInput />
+        </div>
       </div>
       <div className="hidden sm:flex flex-col items-center justify-center w-full h-full sm:w-[40%] lg:w-1/3 text-white">
         Profile Box
