@@ -3,16 +3,29 @@ import clsx from 'clsx';
 import { TfiGallery } from 'react-icons/tfi';
 import { AiOutlineGif } from 'react-icons/ai';
 import { MdOutlineEmojiEmotions } from 'react-icons/md';
+import { useConversations } from '@/context/ConversationsContext';
 
-type MessageInputProps = {};
+type MessageInputProps = {
+  conversationId: string;
+};
 
-export default function MessageInput({}: MessageInputProps): JSX.Element {
+export default function MessageInput({ conversationId }: MessageInputProps): JSX.Element {
+  const { sendMessage } = useConversations();
   const [messageInput, setMessageInput] = useState('');
   const [buttonActive, setButtonActive] = useState(false);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setMessageInput(e.target.value);
     setButtonActive(e.target.value.length > 0);
+  };
+
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (messageInput.length > 0) {
+      sendMessage(conversationId, { format: 'text', body: messageInput });
+      setMessageInput('');
+      setButtonActive(false);
+    }
   };
 
   return (
@@ -34,7 +47,7 @@ export default function MessageInput({}: MessageInputProps): JSX.Element {
         </button>
       </div>
       <div className="h-1/2 flex items-center flex-1 ml-2 lg:ml-5">
-        <form className="w-full h-full flex items-center">
+        <form className="w-full h-full flex items-center" onSubmit={handleSubmit}>
           <input
             type="text"
             value={messageInput}

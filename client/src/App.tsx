@@ -111,10 +111,10 @@ const messagesRoute = new Route({
   path: '/',
   component: () => {
     return (
-      <>
+      <div className="w-full h-full">
         <MobileHeader />
         <MessagesPage />
-      </>
+      </div>
     );
   },
 });

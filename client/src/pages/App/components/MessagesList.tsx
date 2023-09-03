@@ -1,13 +1,24 @@
+import { useMemo } from 'react';
 import clsx from 'clsx';
 import { Link } from '@tanstack/router';
 import { useLikesTeaser } from '@/context/LikesContext';
+import { useConversations } from '@/context/ConversationsContext';
 import UserAvatar from './UserAvatar';
+import ConversationBox from './ConversationBox';
 
 interface MessageListProps {}
 
 export function MessagesList({}: MessageListProps): JSX.Element {
   const { likesTeaser, loading } = useLikesTeaser();
   const { likes, latestLike } = likesTeaser;
+  const { conversations } = useConversations();
+
+  const realConversations = useMemo(() => {
+    return conversations.filter((conversation) => {
+      return conversation.messages.length > 0;
+    });
+  }, [conversations]);
+
   return (
     <section className="h-[92%] overflow-y-scroll no-scrollbar p-2">
       <Link
@@ -31,10 +42,10 @@ export function MessagesList({}: MessageListProps): JSX.Element {
           <p className="text-sm text-slate-500 dark:text-gray-400">Match Now!</p>
         </div>
       </Link>
-      {new Array(10).fill(0).map((_, i) => {
+      {realConversations.map((conv, i) => {
         return (
-          <div key={i} className="w-full border-b border-b-slate-300 h-20 dark:border-b-gray-700">
-            Conversation {i}
+          <div key={i} className="w-full border-b border-b-slate-300 h-16 dark:border-b-gray-700">
+            <ConversationBox conversation={conv} />
           </div>
         );
       })}

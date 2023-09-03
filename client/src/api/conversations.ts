@@ -12,6 +12,7 @@ const userSchema = z
     images: z.array(imageSchema),
   })
   .strip();
+export type User = z.infer<typeof userSchema>;
 
 export const messageSchema = z.object({
   id: z.string(),
@@ -50,6 +51,57 @@ export const getConversations = async (token: string): Promise<GetConversationsR
       return acc;
     }, []);
     return { status: 'success', data: validated };
+  } catch (err) {
+    if (err instanceof axios.AxiosError) {
+      if (err.response?.status === 401) {
+        return { status: 'error', error: 'unauthorized' };
+      }
+      return { status: 'error', error: 'serverError' };
+    } else {
+      return { status: 'error', error: 'unknownError' };
+    }
+  }
+};
+
+const messagePosted = messageSchema.extend({
+  conversationId: z.string(),
+});
+
+export type MessagePosted = z.infer<typeof messagePosted>;
+
+type PostMessageResult =
+  | { status: 'success'; data: MessagePosted }
+  | { status: 'error'; error: string };
+
+const postMessageInput = z.union([
+  z.object({
+    format: z.literal('text'),
+    body: z.string(),
+  }),
+  z.object({
+    format: z.literal('media'),
+    body: imageSchema,
+  }),
+]);
+export type PostMessageInput = z.infer<typeof postMessageInput>;
+
+export const postMessage = async (
+  token: string,
+  conversationId: string,
+  input: PostMessageInput
+): Promise<PostMessageResult> => {
+  try {
+    const response = await api.post(`/conversations/${conversationId}`, input, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    const result = messagePosted.safeParse(response.data);
+    if (result.success) {
+      return { status: 'success', data: result.data };
+    }
+    console.log(result.error);
+    return { status: 'error', error: 'unknownError' };
   } catch (err) {
     if (err instanceof axios.AxiosError) {
       if (err.response?.status === 401) {

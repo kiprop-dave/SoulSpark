@@ -7,6 +7,7 @@ import { useAuth } from '@/context/AuthContext';
 import { useConversations } from '@/context/ConversationsContext';
 import { useAppRoutes } from '@/hooks/useAppRoutes';
 import UserAvatar from '@/pages/App/components/UserAvatar';
+import ConversationBody from './components/ConversationBody';
 import NoMessages from './components/NoMessages';
 import MessageInput from './components/MessageInput';
 
@@ -20,6 +21,7 @@ export default function ConversationPage(): JSX.Element {
   if (!conversation) {
     return <Navigate to="/app/messages" replace />;
   }
+  const messages = conversation.messages;
 
   const otherUser = conversation.participants.find((p) => p.id !== user!.id)!; // User will always be defined here
 
@@ -59,7 +61,7 @@ export default function ConversationPage(): JSX.Element {
         </nav>
         <div className="h-[80%] md:h-[74%]">
           {conversation.messages.length > 0 ? (
-            <div>Messages Box</div>
+            <ConversationBody messages={messages} otherUser={otherUser} />
           ) : (
             <div className="w-full h-full flex items-center justify-center">
               <NoMessages
@@ -71,7 +73,7 @@ export default function ConversationPage(): JSX.Element {
           )}
         </div>
         <div className="h-[12%] md:h-[12%] w-full border-t border-slate-300 dark:border-gray-700">
-          <MessageInput />
+          <MessageInput conversationId={conversationId} />
         </div>
       </div>
       <div className="hidden sm:flex flex-col items-center justify-center w-full h-full sm:w-[40%] lg:w-1/3 text-white">
