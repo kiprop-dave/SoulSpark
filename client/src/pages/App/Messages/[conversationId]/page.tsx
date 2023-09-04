@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import { Navigate, Link } from '@tanstack/router';
 import { format } from 'date-fns';
 import { ImCross } from 'react-icons/im';
@@ -14,8 +14,12 @@ import MessageInput from './components/MessageInput';
 export default function ConversationPage(): JSX.Element {
   const { user } = useAuth();
   const { location } = useAppRoutes();
-  const { conversations } = useConversations();
+  const { conversations, markMessagesAsSeen } = useConversations();
   const conversationId = useMemo(() => location.split('/')[2], [location, conversations]);
+
+  useEffect(() => {
+    markMessagesAsSeen(conversationId);
+  }, [conversationId, conversations]);
 
   const conversation = conversations.find((c) => c.id === conversationId);
   if (!conversation) {

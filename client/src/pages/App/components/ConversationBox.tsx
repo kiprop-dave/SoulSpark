@@ -1,10 +1,10 @@
+import { useMemo } from 'react';
 import clsx from 'clsx';
 import { Link } from '@tanstack/router';
 import { format, differenceInHours } from 'date-fns';
 import { useAuth } from '@/context/AuthContext';
 import { Conversation } from '@/api/conversations';
 import UserAvatar from './UserAvatar';
-import { useMemo } from 'react';
 
 type ConversationBoxProps = {
   conversation: Conversation;

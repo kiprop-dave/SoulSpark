@@ -3,14 +3,16 @@ import { errorHandler } from '../utils/errorHandler';
 import { personalInfoSchema } from '../types';
 import { z } from 'zod';
 
-const latestLike = personalInfoSchema.pick({
-  first_name: true,
-}).strip();
+const latestLike = personalInfoSchema
+  .pick({
+    first_name: true,
+  })
+  .strip();
 
 type LatestLike = z.infer<typeof latestLike>;
 
 type getNumberOfLikesResult =
-  | { status: 'success'; data: { likes: number, latestLike: LatestLike } }
+  | { status: 'success'; data: { likes: number; latestLike: LatestLike } }
   | { status: 'error'; error: ReturnType<typeof errorHandler> };
 
 export const getLikesTeaser = async (userId: string): Promise<getNumberOfLikesResult> => {
@@ -32,8 +34,8 @@ export const getLikesTeaser = async (userId: string): Promise<getNumberOfLikesRe
         profile: {
           select: {
             first_name: true,
-          }
-        }
+          },
+        },
       },
     });
 
@@ -46,11 +48,12 @@ export const getLikesTeaser = async (userId: string): Promise<getNumberOfLikesRe
     }
 
     return {
-      status: 'success', data: { likes, latestLike: { first_name: '' } }
+      status: 'success',
+      data: { likes, latestLike: { first_name: '' } },
     };
   } catch (err) {
     const error = errorHandler(err);
-    console.log(error, "error in getLikesTeaser");
+    console.log(error, 'error in getLikesTeaser');
     return { status: 'error', error };
   }
 };

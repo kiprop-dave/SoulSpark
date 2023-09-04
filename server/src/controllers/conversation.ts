@@ -1,9 +1,10 @@
-import { z } from "zod";
-import prisma from "../lib/prisma";
-import { imageSchema } from "../types";
-import { errorHandler } from "../utils/errorHandler";
+import { z } from 'zod';
+import prisma from '../lib/prisma';
+import { imageSchema } from '../types';
+import { errorHandler } from '../utils/errorHandler';
+import { pusherServer } from '../lib/pusher';
 
-const messageSchema = z.object({
+export const messageSchema = z.object({
   id: z.string(),
   createdAt: z.date(),
   text: z.string().optional(),
@@ -11,14 +12,17 @@ const messageSchema = z.object({
   senderId: z.string(),
   attachment: imageSchema.optional().nullable(),
 });
+export type Message = z.infer<typeof messageSchema>;
 
-const userSchema = z.object({
-  id: z.string(),
-  first_name: z.string(),
-  images: z.array(imageSchema),
-}).strip();
+export const userSchema = z
+  .object({
+    id: z.string(),
+    first_name: z.string(),
+    images: z.array(imageSchema),
+  })
+  .strip();
 
-const conversationSchema = z.object({
+export const conversationSchema = z.object({
   id: z.string(),
   createdAt: z.date(),
   participants: z.tuple([userSchema, userSchema]),
@@ -35,18 +39,23 @@ export const getConversations = async (userId: string): Promise<GetConversations
       where: {
         participants: {
           some: {
-            id: userId
-          }
-        }
+            id: userId,
+          },
+        },
       },
       include: {
         messages: {
           orderBy: {
-            createdAt: 'desc'
+            createdAt: 'desc',
           },
           include: {
-            attachment: true
-          }
+            attachment: true,
+            seenBy: {
+              select: {
+                id: true,
+              },
+            },
+          },
         },
         participants: {
           select: {
@@ -54,39 +63,166 @@ export const getConversations = async (userId: string): Promise<GetConversations
             profile: {
               select: {
                 first_name: true,
-                images: true
-              }
-            }
-          }
-        }
-      }
+                images: true,
+              },
+            },
+          },
+        },
+      },
     });
 
     const validated = conversations.reduce((acc: Conversation[], curr) => {
-      console.log(curr, 'curr')
+      const messages = curr.messages.reduce((acc: Message[], curr) => {
+        const m = messageSchema.safeParse({
+          id: curr.id,
+          createdAt: curr.createdAt,
+          text: curr.text,
+          seenBy: curr.seenBy.map((user) => user.id),
+          senderId: curr.senderId,
+          attachment: curr.attachment,
+        });
+        if (m.success) {
+          acc.push(m.data);
+        }
+        return acc;
+      }, []);
       const c = conversationSchema.safeParse({
         id: curr.id,
         createdAt: curr.createdAt,
-        participants: [{
-          id: curr.participants[0].id,
-          ...curr.participants[0].profile,
-        }, {
-          id: curr.participants[1].id,
-          ...curr.participants[1].profile,
-        }],
-        messages: curr.messages
+        participants: [
+          {
+            id: curr.participants[0].id,
+            ...curr.participants[0].profile,
+          },
+          {
+            id: curr.participants[1].id,
+            ...curr.participants[1].profile,
+          },
+        ],
+        messages: messages,
       });
       if (c.success) {
         acc.push(c.data);
       }
       return acc;
     }, []);
-    console.log(validated, 'validated')
 
-    return { status: "success", data: validated };
+    return { status: 'success', data: validated };
   } catch (err) {
     const error = errorHandler(err);
     console.log(error.type, error.message, 'error in getConversations');
     return { status: 'error', error: error.type };
   }
-}
+};
+
+export const messagePosted = messageSchema.extend({
+  conversationId: z.string(),
+});
+
+type PostMessageResult =
+  | { status: 'success'; data: z.infer<typeof messagePosted> }
+  | { status: 'error'; error: string };
+
+export const postMessageInput = z.union([
+  z.object({
+    format: z.literal('text'),
+    body: z.string(),
+  }),
+  z.object({
+    format: z.literal('media'),
+    body: imageSchema,
+  }),
+]);
+type PostMessageInput = z.infer<typeof postMessageInput>;
+
+export const postMessage = async (
+  userId: string,
+  conversationId: string,
+  message: PostMessageInput
+): Promise<PostMessageResult> => {
+  try {
+    const updatedConversation = await prisma.conversation.update({
+      where: {
+        id: conversationId,
+      },
+      data: {
+        messages: {
+          create: {
+            text: message.format === 'text' ? message.body : undefined,
+            attachment: {
+              create: message.format === 'media' ? message.body : undefined,
+            },
+            senderId: userId,
+            seenBy: {
+              connect: {
+                id: userId,
+              },
+            },
+          },
+        },
+      },
+      include: {
+        messages: {
+          orderBy: {
+            createdAt: 'desc',
+          },
+          take: 1,
+          include: {
+            attachment: true,
+            seenBy: {
+              select: {
+                id: true,
+              },
+            },
+          },
+        },
+        participants: true,
+      },
+    });
+
+    const validated = messagePosted.safeParse({
+      id: updatedConversation.messages[0].id,
+      createdAt: updatedConversation.messages[0].createdAt,
+      text: updatedConversation.messages[0].text,
+      seenBy: updatedConversation.messages[0].seenBy.map((user) => user.id),
+      senderId: updatedConversation.messages[0].senderId,
+      attachment: updatedConversation.messages[0].attachment,
+      conversationId: updatedConversation.id,
+    });
+
+    if (validated.success) {
+      const otherUser = updatedConversation.participants.find((user) => user.id !== userId)!; // Guaranteed to exist
+      await pusherServer.trigger(otherUser.id, 'new-message', validated.data); // Send pusher notification to other user
+      return { status: 'success', data: validated.data }; // The sender will receive the update through normal rest api
+    }
+    return { status: 'error', error: 'validation' };
+  } catch (err) {
+    const error = errorHandler(err);
+    console.log(error.type, error.message, 'error in postMessage');
+    return { status: 'error', error: error.type };
+  }
+};
+
+type MarkMessagesSeenResult = { status: 'success' } | { status: 'error'; error: string };
+export const markMessagesSeen = async (
+  userId: string,
+  messageIds: string[]
+): Promise<MarkMessagesSeenResult> => {
+  try {
+    await prisma.user.update({
+      where: {
+        id: userId,
+      },
+      data: {
+        seenMessages: {
+          connect: messageIds.map((id) => ({ id })),
+        },
+      },
+    });
+    return { status: 'success' };
+  } catch (err) {
+    const error = errorHandler(err);
+    console.log(error.type, error.message, 'error in markMessagesSeen');
+    return { status: 'error', error: error.type };
+  }
+};

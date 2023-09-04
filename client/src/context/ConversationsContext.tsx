@@ -6,6 +6,7 @@ import {
   postMessage,
   PostMessageInput,
   MessagePosted,
+  markMessagesSeen,
 } from '@/api/conversations';
 import { pusherClient } from '@/lib/pusher';
 
@@ -13,6 +14,7 @@ type ConversationContextType = {
   conversations: Conversation[];
   isLoading: boolean;
   sendMessage: (conversationId: string, message: PostMessageInput) => void;
+  markMessagesAsSeen: (conversationId: string) => void;
 };
 
 export const ConversationsContext = createContext<ConversationContextType | null>(null);
@@ -48,7 +50,7 @@ export function ConversationsContextProvider({
 
     const newConversationHandler = (data: Conversation) => {
       setInitialConversations((prev) => {
-        return [...prev, data];
+        return [data, ...prev];
       });
     };
 
@@ -58,7 +60,7 @@ export function ConversationsContextProvider({
           if (conversation.id === data.conversationId) {
             return {
               ...conversation,
-              messages: [...conversation.messages, data],
+              messages: [data, ...conversation.messages],
             };
           }
           return conversation;
@@ -94,7 +96,7 @@ export function ConversationsContextProvider({
             if (conversation.id === conversationId) {
               return {
                 ...conversation,
-                messages: [...conversation.messages, res.data],
+                messages: [res.data, ...conversation.messages],
               };
             }
             return conversation;
@@ -104,10 +106,40 @@ export function ConversationsContextProvider({
     });
   };
 
+  const markMessagesAsSeen = (conversationId: string) => {
+    if (!user) return;
+    const conversation = initialConversations.find(
+      (conversation) => conversation.id === conversationId
+    );
+    if (!conversation) return;
+    const messages = conversation.messages
+      .filter((msg) => !msg.seenBy.includes(user.id))
+      .map((msg) => msg.id);
+    if (messages.length === 0) return;
+    markMessagesSeen(user.accessToken, messages).then((res) => {
+      if (res.status === 'success') {
+        setInitialConversations((prev) =>
+          prev.map((conv) => {
+            if (conv.id === conversationId) {
+              return {
+                ...conv,
+                messages: conv.messages.map((msg) =>
+                  msg.seenBy.includes(user.id) ? msg : { ...msg, seenBy: [...msg.seenBy, user.id] }
+                ),
+              };
+            }
+            return conv;
+          })
+        );
+      }
+    });
+  };
+
   const values: ConversationContextType = {
     conversations: initialConversations,
     isLoading,
     sendMessage,
+    markMessagesAsSeen,
   };
 
   return <ConversationsContext.Provider value={values}>{children}</ConversationsContext.Provider>;

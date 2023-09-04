@@ -25,4 +25,19 @@ oauthCallbackRouter.route('/google').get(async (req, res) => {
   }
 });
 
+oauthCallbackRouter.route('/facebook').get(async (req, res) => {
+  try {
+    const code = z.string().parse(req.query.code);
+    console.log(code);
+    res.redirect(appConstants.CLIENT_URL);
+  } catch (err) {
+    if (err instanceof z.ZodError) {
+      console.error(err.issues);
+      return res.sendStatus(400);
+    }
+    console.error(err);
+    return res.sendStatus(500);
+  }
+});
+
 export default oauthCallbackRouter;

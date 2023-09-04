@@ -1,5 +1,3 @@
-import { Prisma } from '@prisma/client';
-import { ZodError } from 'zod';
 import prisma from '../lib/prisma';
 import {
   UserProfile,
@@ -8,6 +6,7 @@ import {
   otherInfoSchema,
   preferencesSchema,
 } from '../types';
+import { errorHandler } from '../utils/errorHandler';
 
 // This checks if a user has completed the compulsory profile fields
 export async function checkUserProfile(userId: string): Promise<boolean> {
@@ -34,7 +33,8 @@ export async function checkUserProfile(userId: string): Promise<boolean> {
     }
 
     const keys = Object.keys(hasProfile) as Array<keyof typeof hasProfile>;
-    const hasAllKeys = keys.every((key) => hasProfile[key] !== null);
+    const hasAllKeys =
+      keys.every((key) => hasProfile[key] !== null) && hasProfile.images.length > 0;
     return hasAllKeys;
   } catch (err) {
     console.log(err);
@@ -75,36 +75,12 @@ export async function getUserProfile(userId: string): Promise<UserProfile | null
       preferences,
     };
   } catch (err) {
-    if (err instanceof ZodError) {
-      console.log(err.issues);
-    }
+    const error = errorHandler(err);
+    console.log('error fetching user profile', error.type, error.message);
     throw new Error('Error fetching user profile');
   }
 }
 
-// id                  String         @id @default(uuid())
-// first_name          String         @db.VarChar(50)
-// last_name           String         @db.VarChar(50)
-// dateOfBirth         DateTime
-// gender              Gender
-// images              DigitalAsset[]
-// bio                 String?
-// languages           String[]
-// zodiac              String?        @db.VarChar(50)
-// education           String?        @db.VarChar(50)
-// occupation          String?        @db.VarChar(50)
-// interests           String[]
-// diet                String?        @db.VarChar(50)
-// drinking            String?        @db.VarChar(50)
-// smoking             String?        @db.VarChar(50)
-// pets                String?        @db.VarChar(50)
-// socialMediaActivity String?        @db.VarChar(50)
-// socials             String[]
-// lookingFor          String         @db.VarChar(150)
-// attraction          String         @db.VarChar(50)
-// minimumAge          Int
-// maximumAge          Int
-//
 export async function createProfile(userId: string, data: UserProfile): Promise<UserProfile> {
   try {
     const createdProfile = await prisma.profile.create({

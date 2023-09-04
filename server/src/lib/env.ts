@@ -8,6 +8,11 @@ const envSchema = object({
   REFRESH_TOKEN_SECRET: string(),
   GOOGLE_CLIENT_SECRET: string(),
   GOOGLE_CLIENT_ID: string(),
+  FACEBOOK_CLIENT_SECRET: string(),
+  FACEBOOK_CLIENT_ID: string(),
+  PUSHER_APP_ID: string(),
+  PUSHER_KEY: string(),
+  PUSHER_SECRET: string(),
 });
 
 export const env = envSchema.parse(process.env);

@@ -5,6 +5,17 @@ import { api } from './base';
 
 import { PossibleError } from './matches';
 
+const errorHandler = (err: unknown): { status: 'error'; error: PossibleError } => {
+  if (err instanceof axios.AxiosError) {
+    if (err.response?.status === 401) {
+      return { status: 'error', error: 'unauthorized' };
+    }
+    return { status: 'error', error: 'serverError' };
+  } else {
+    return { status: 'error', error: 'unknownError' };
+  }
+};
+
 const userSchema = z
   .object({
     id: z.string(),
@@ -103,13 +114,27 @@ export const postMessage = async (
     console.log(result.error);
     return { status: 'error', error: 'unknownError' };
   } catch (err) {
-    if (err instanceof axios.AxiosError) {
-      if (err.response?.status === 401) {
-        return { status: 'error', error: 'unauthorized' };
+    return errorHandler(err);
+  }
+};
+
+type MarkMessagesSeenResult = { status: 'success' } | { status: 'error'; error: PossibleError };
+export const markMessagesSeen = async (
+  token: string,
+  messageIds: string[]
+): Promise<MarkMessagesSeenResult> => {
+  try {
+    await api.patch(
+      '/conversations/seen',
+      { messageIds: messageIds },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       }
-      return { status: 'error', error: 'serverError' };
-    } else {
-      return { status: 'error', error: 'unknownError' };
-    }
+    );
+    return { status: 'success' };
+  } catch (err) {
+    return errorHandler(err);
   }
 };

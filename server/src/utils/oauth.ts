@@ -22,9 +22,25 @@ export async function getGoogleUserInfo(tokenInfo: AccessToken): Promise<GoogleU
   const res = await fetch(url, {
     method: 'GET',
     headers: {
-      Authorization: `Bearer ${tokenInfo.id_token}`,
+      Authorization: `Bearer ${tokenInfo?.id_token}`,
     },
   });
   const data = await res.json();
   return googleUserInfoSchema.parse(data);
+}
+
+export async function getFacebookAccessToken(code: string): Promise<AccessToken> {
+  try {
+    const url = `https://graph.facebook.com/v17.0/oauth/access_token?client_id=${env.FACEBOOK_CLIENT_ID}&redirect_uri=http://localhost:3000/oauth/callback/facebook&client_secret=${env.FACEBOOK_CLIENT_SECRET}&code=${code}`;
+    const res = await fetch(url, {
+      method: 'GET',
+      headers: {
+        accept: 'application/json',
+      },
+    });
+    const data = await res.json();
+    return accessTokenSchema.parse(data);
+  } catch (err) {
+    throw err;
+  }
 }

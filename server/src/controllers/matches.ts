@@ -1,7 +1,15 @@
 import { z } from 'zod';
 import prisma from '../lib/prisma';
 import { errorHandler } from '../utils/errorHandler';
-import { PossibleMatch, personalInfoSchema, basicInfoSchema, otherInfoSchema } from '../types';
+import { pusherServer } from '../lib/pusher';
+import {
+  PossibleMatch,
+  personalInfoSchema,
+  basicInfoSchema,
+  otherInfoSchema,
+  Match,
+} from '../types';
+import { messageSchema, Message, userSchema, conversationSchema } from './conversation';
 
 type PossibleError = 'notFound' | 'unknown';
 
@@ -115,11 +123,11 @@ export const getPossibleMatches = async (userId: string): Promise<GetPossibleMat
 };
 
 type LikeUserResult =
-  | { status: 'success'; isMatch: boolean, conversationId?: string, matchedAt?: Date }
+  | { status: 'success'; isMatch: boolean; conversationId?: string; matchedAt?: Date }
   | { status: 'error'; error: PossibleError };
 export const likeUser = async (userId: string, matchId: string): Promise<LikeUserResult> => {
   try {
-    await prisma.user.update({
+    const user = await prisma.user.update({
       where: {
         id: userId,
       },
@@ -127,6 +135,13 @@ export const likeUser = async (userId: string, matchId: string): Promise<LikeUse
         likes: {
           connect: {
             id: matchId,
+          },
+        },
+      },
+      select: {
+        profile: {
+          include: {
+            images: true,
           },
         },
       },
@@ -149,14 +164,65 @@ export const likeUser = async (userId: string, matchId: string): Promise<LikeUse
       const conversation = await prisma.conversation.create({
         data: {
           participants: {
-            connect: [
-              { id: userId },
-              { id: matchId }
-            ]
-          }
-        }
-      })
-      return { status: 'success', isMatch: true, conversationId: conversation.id, matchedAt: conversation.createdAt };
+            connect: [{ id: userId }, { id: matchId }],
+          },
+        },
+        include: {
+          participants: {
+            select: {
+              id: true,
+              profile: {
+                select: {
+                  first_name: true,
+                  images: true,
+                },
+              },
+            },
+          },
+          messages: true,
+        },
+      });
+
+      const c = conversationSchema.safeParse({
+        id: conversation.id,
+        createdAt: conversation.createdAt,
+        participants: [
+          {
+            id: conversation.participants[0].id,
+            ...conversation.participants[0].profile,
+          },
+          {
+            id: conversation.participants[1].id,
+            ...conversation.participants[1].profile,
+          },
+        ],
+        messages: [],
+      });
+
+      if (c.success) {
+        // Send a pusher notification for the new conversation
+        await pusherServer.trigger(matchId, 'new-conversation', c.data);
+      }
+
+      const match: Match = {
+        conversationId: conversation.id,
+        userId: userId,
+        profile: {
+          personalInfo: personalInfoSchema.parse(user.profile), // Could throw an error, but we know it's valid
+          basicInfo: basicInfoSchema.optional().parse(user.profile),
+          otherInfo: otherInfoSchema.optional().parse(user.profile),
+        },
+      };
+
+      // Send a notification to the other user
+      await pusherServer.trigger(matchId, 'new-match', match);
+
+      return {
+        status: 'success',
+        isMatch: true,
+        conversationId: conversation.id,
+        matchedAt: conversation.createdAt,
+      };
     } else {
       return { status: 'success', isMatch: false };
     }
@@ -190,7 +256,7 @@ export const dislikeUser = async (userId: string, matchId: string): Promise<Disl
 };
 
 type GetMatchesResult =
-  | { status: 'success'; data: PossibleMatch[] }
+  | { status: 'success'; data: Match[] }
   | { status: 'error'; error: ReturnType<typeof errorHandler> };
 export const getMatches = async (userId: string): Promise<GetMatchesResult> => {
   try {
@@ -214,14 +280,32 @@ export const getMatches = async (userId: string): Promise<GetMatchesResult> => {
             images: true,
           },
         },
+        conversations: {
+          where: {
+            participants: {
+              some: {
+                id: userId,
+              },
+            },
+          },
+          include: {
+            messages: true,
+          },
+        },
       },
     });
 
-    const validatedData = matches.reduce((acc: PossibleMatch[], match) => {
+    const validatedData = matches.reduce((acc: Match[], match) => {
       const personalInfo = personalInfoSchema.safeParse(match.profile);
       const basicInfo = basicInfoSchema.optional().safeParse(match.profile);
       const otherInfo = otherInfoSchema.optional().safeParse(match.profile);
-      if (personalInfo.success) {
+      const conversation = match.conversations[0];
+      // Return only the matches that have not started a conversation
+      if (
+        personalInfo.success &&
+        conversation !== undefined &&
+        conversation.messages.length === 0
+      ) {
         acc.push({
           userId: match.id,
           profile: {
@@ -229,6 +313,7 @@ export const getMatches = async (userId: string): Promise<GetMatchesResult> => {
             basicInfo: basicInfo.success ? basicInfo.data : undefined,
             otherInfo: otherInfo.success ? otherInfo.data : undefined,
           },
+          conversationId: conversation.id,
         });
       }
       return acc;

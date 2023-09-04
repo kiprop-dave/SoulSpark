@@ -94,6 +94,7 @@ enum Gender {
 model Conversation {
   id        String   @id @default(uuid())
   createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
 
   participants User[]    @relation("conversationMembership")
   messages     Message[]

@@ -85,9 +85,12 @@ const fetchRandomUsers = async (n: number): Promise<RandomUser[]> => {
     const data = await users.json();
     let validResults: RandomUser[] = [];
     data.results.forEach((user: any) => {
+      const randomAge = Math.floor(Math.random() * 15) + 18;
       const parseRes = randomUser.safeParse(user)
       if (parseRes.success) {
-        validResults.push(parseRes.data);
+        const user = parseRes.data;
+        user.dob.date = new Date(new Date().setFullYear(new Date().getFullYear() - randomAge));
+        validResults.push(user);
       }
     });
     return validResults;
@@ -164,21 +167,40 @@ const unsplashRespose = z.object({
 
 type UnsplashResponse = z.infer<typeof unsplashRespose>;
 
-const fetchUnsplashImages = async (query: string): Promise<UnsplashResponse> => {
-  const destination = `https://api.unsplash.com/search/photos?query=${query}&per_page=20&orientation=portrait`;
-  try {
-    const response = await fetch(destination, {
+const fetchUnsplashImages = async (queries: string[]): Promise<string[]> => {
+  const results = await Promise.allSettled(queries.map(async (query) => {
+    const destination = `https://api.unsplash.com/search/photos?query=${query}&per_page=40&orientation=portrait`;
+    const res = await fetch(destination, {
       headers: {
         Authorization: `Client-ID ${process.env.UNSPLASH_ACCESS_KEY}`
       }
-    });
-    const data = await response.json();
-    const images = unsplashRespose.parse(data);
-    return images;
-  } catch (err) {
-    console.error("error fetching images")
-    throw new Error('Error fetching images');
-  }
+    })
+    const json = await res.json();
+    const images = await unsplashRespose.parseAsync(json);
+    return images.results.map((el) => el.urls.regular);
+  }));
+
+  let images: string[] = [];
+  return results.reduce((acc, curr) => {
+    if (curr.status === "fulfilled") {
+      return [...acc, ...curr.value];
+    }
+    return acc;
+  }, images);
+  // const destination = `https://api.unsplash.com/search/photos?query=${query}&per_page=40&orientation=portrait`;
+  // try {
+  //   const response = await fetch(destination, {
+  //     headers: {
+  //       Authorization: `Client-ID ${process.env.UNSPLASH_ACCESS_KEY}`
+  //     }
+  //   });
+  //   const data = await response.json();
+  //   const images = unsplashRespose.parse(data);
+  //   return images;
+  // } catch (err) {
+  //   console.error("error fetching images")
+  //   throw new Error('Error fetching images');
+  // }
 }
 
 const uploadImages = async (imagesUrls: string[]): Promise<Image[]> => {
@@ -203,22 +225,22 @@ const seedUsers = async () => {
   const usersCsv = createWriteStream('./users.csv');
   usersCsv.write("email,password\n");
   try {
-    const images1 = await fetchUnsplashImages('black women');
-    const images2 = await fetchUnsplashImages('asian men');
-    const images3 = await fetchUnsplashImages('white women');
-    const images4 = await fetchUnsplashImages('black men');
-    const images = [...images1.results, ...images2.results, ...images3.results, ...images4.results]
-    const imagesUrls = images.map((img) => img.urls.regular);
-    const imagesUploaded = await uploadImages(imagesUrls);
+    const images = await fetchUnsplashImages(["black women", "asian men", "white women", "black men", "white men", "asian women"])
+    const imagesUploaded = await uploadImages(images);
     const savedImages = await saveImagesToDb(imagesUploaded);
     const len = savedImages.length;
-    const users = await fetchRandomUsers(20);
+    const users = await fetchRandomUsers(40);
+    const imagesPerUser = Math.floor(len / users.length);
+    if (imagesPerUser < 1) {
+      console.log("Images not uploaded");
+      return;
+    }
     for (let i = 0; i < users.length; i++) {
       try {
         const user = users[i];
         const password = await hashPassword(user.login.password);
         const profile = generateProfile(user);
-        const imagesIds = savedImages.slice(i * 4, i * 4 + 4);
+        const imagesIds = savedImages.slice(i * imagesPerUser, (i + 1) * imagesPerUser);
         await createUserAndProfile(user.email, password, profile, imagesIds);
         usersCsv.write(`${user.email},${user.login.password}\n`);
       } catch (err) {

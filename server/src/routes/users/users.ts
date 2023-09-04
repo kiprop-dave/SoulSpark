@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { userProfileSchema } from '../../types';
 import { verifyAccessTokenMiddleware } from '../../middleware/verifyAccessToken';
-import { getUserProfile, createProfile } from '../../controllers/users';
+import { getUserProfile, createProfile } from '../../controllers/profile';
 
 const usersRouter = Router();
 
@@ -28,7 +28,7 @@ usersRouter
   .post(async (req, res) => {
     try {
       const id = req.params.userId;
-      console.log(req.body);
+
       const data = await userProfileSchema.parseAsync(req.body);
       const updatedProfile = await createProfile(id, data);
       return res.status(200).json(updatedProfile);
