@@ -1,10 +1,11 @@
 import { createContext, useEffect, useState, useContext } from 'react';
 import { LoggedInUser } from '@/types';
-import { getLoggedInUser } from '@/api/user';
+import { getLoggedInUser, logout } from '@/api/user';
 
 type AuthContextType = {
   user: LoggedInUser | null;
   setUserContext: (user: LoggedInUser | null) => void;
+  logoutUser: () => void;
 };
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -20,11 +21,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setUser(user);
   };
 
-  // console.log(user);
+  const logoutUser = () => {
+    logout().then(() => setUser(null));
+  };
 
   const contextValue = {
     user,
     setUserContext,
+    logoutUser,
   };
 
   return <AuthContext.Provider value={contextValue}>{children}</AuthContext.Provider>;

@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { createUser, getUserByEmail } from '../controllers/users';
 import { userCredentialsSchema } from '../types';
-import { getSession, createSession } from '../utils/session';
+import { getSession, createSession, deleteSession } from '../utils/session';
 import { pusherServer } from '../lib/pusher';
 import { comparePassword, hashPassword } from '../utils/password';
 import { generateAccessToken } from '../utils/webToken';
@@ -94,7 +94,15 @@ authRouter.route('/login').post(async (req, res) => {
   }
 });
 
+authRouter.route('/logout').post(async (req, res) => {
+  const session = await getSession(req);
+  if (!session) return res.status(401).send({ message: 'You are not logged in.' });
+  await deleteSession(res, session.id);
+  return res.sendStatus(200);
+});
+
 authRouter.route('/pusher').post(async (req, res) => {
+  console.log(req.headers.origin);
   // const session = await getSession(req);
   // if (!session) {
   //   return res.status(401).send({ message: 'You are not logged in.' });

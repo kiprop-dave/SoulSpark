@@ -83,6 +83,7 @@ export function ConversationsContextProvider({
       pusherClient.unbind('new-message', newMessageHandler);
       pusherClient.unbind('delete-conversation', deleteConversationHandler);
       pusherClient.unsubscribe(channel);
+      pusherClient.disconnect();
     };
   }, [channel]);
 

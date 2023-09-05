@@ -48,6 +48,17 @@ export async function signupWithCredentials(cred: Credentials): Promise<void> {
   }
 }
 
+type LogoutResult = { status: 'success' } | { status: 'error'; error: string };
+export async function logout(): Promise<LogoutResult> {
+  try {
+    await api.post('auth/logout');
+    return { status: 'success' };
+  } catch (err) {
+    console.error(err);
+    return { status: 'error', error: 'unknown error' };
+  }
+}
+
 export async function getUserProfile(id: string, accessToken: string): Promise<UserProfile | null> {
   try {
     const { data } = await api.get(`users/profile/${id}`, {
