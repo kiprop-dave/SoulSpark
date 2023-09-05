@@ -102,11 +102,10 @@ authRouter.route('/logout').post(async (req, res) => {
 });
 
 authRouter.route('/pusher').post(async (req, res) => {
-  console.log(req.headers.origin);
-  // const session = await getSession(req);
-  // if (!session) {
-  //   return res.status(401).send({ message: 'You are not logged in.' });
-  // }
+  const session = await getSession(req);
+  if (!session) {
+    return res.status(401).send({ message: 'You are not logged in.' });
+  }
   const body = z
     .object({
       socket_id: z.string(),

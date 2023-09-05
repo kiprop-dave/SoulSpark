@@ -46,7 +46,7 @@ export function ConversationsContextProvider({
 
   useEffect(() => {
     if (!channel) return;
-    pusherClient.subscribe(channel);
+    pusherClient.subscribe(`private-user-${channel}`);
 
     const newConversationHandler = (data: Conversation) => {
       setInitialConversations((prev) => {
@@ -83,7 +83,6 @@ export function ConversationsContextProvider({
       pusherClient.unbind('new-message', newMessageHandler);
       pusherClient.unbind('delete-conversation', deleteConversationHandler);
       pusherClient.unsubscribe(channel);
-      pusherClient.disconnect();
     };
   }, [channel]);
 

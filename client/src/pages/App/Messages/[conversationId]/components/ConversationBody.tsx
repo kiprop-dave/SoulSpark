@@ -26,7 +26,7 @@ export default function ConversationBody({
   }, [messages.length]);
 
   return (
-    <div className="w-full h-full relative flex flex-col gap-2 py-2 overflow-y-scroll no-scrollbar">
+    <div className="w-full h-full flex flex-col gap-2 py-2 overflow-y-scroll no-scrollbar">
       {orderedMessages.map((msg) => {
         return (
           <div
@@ -40,7 +40,7 @@ export default function ConversationBody({
           </div>
         );
       })}
-      <div ref={viewRef} className="w-full h-1 absolute bottom-0" />
+      <div ref={viewRef} className="w-full h-1" />
     </div>
   );
 }

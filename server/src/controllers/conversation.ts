@@ -192,7 +192,7 @@ export const postMessage = async (
 
     if (validated.success) {
       const otherUser = updatedConversation.participants.find((user) => user.id !== userId)!; // Guaranteed to exist
-      await pusherServer.trigger(otherUser.id, 'new-message', validated.data); // Send pusher notification to other user
+      await pusherServer.trigger(`private-user-${otherUser.id}`, 'new-message', validated.data); // Send pusher notification to other user
       return { status: 'success', data: validated.data }; // The sender will receive the update through normal rest api
     }
     return { status: 'error', error: 'validation' };
