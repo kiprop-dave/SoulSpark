@@ -8,6 +8,7 @@ import {
   postMessageInput,
   markMessagesSeen,
 } from '../../controllers/conversation';
+import { getUserProfile } from '../../controllers/profile';
 
 const conversationRouter = Router();
 
@@ -63,6 +64,33 @@ conversationRouter.route('/seen').patch(async (req, res) => {
     return res.status(500).send('Internal Server Error');
   }
   return res.status(200).json({ status: 'success' });
+});
+
+// Fetch the other user's profile
+conversationRouter.route('/profile/:id').get(async (req, res) => {
+  try {
+    const session = await getSession(req);
+    if (!session) {
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
+    const id = req.params.id;
+    const profile = await getUserProfile(id);
+
+    if (!profile) {
+      return res.status(404).json({ error: 'Profile not found' });
+    }
+
+    return res
+      .status(200)
+      .json({
+        personalInfo: profile.personalInfo,
+        basicInfo: profile.basicInfo,
+        otherInfo: profile.otherInfo,
+      });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).send('Internal Server Error');
+  }
 });
 
 export { conversationRouter };

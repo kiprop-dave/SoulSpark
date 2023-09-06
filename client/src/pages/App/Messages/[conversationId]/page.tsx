@@ -10,6 +10,7 @@ import UserAvatar from '@/pages/App/components/UserAvatar';
 import ConversationBody from './components/ConversationBody';
 import NoMessages from './components/NoMessages';
 import MessageInput from './components/MessageInput';
+import ProfileCard from '../../components/ProfileCard';
 
 export default function ConversationPage(): JSX.Element {
   const { user } = useAuth();
@@ -81,7 +82,7 @@ export default function ConversationPage(): JSX.Element {
         </div>
       </div>
       <div className="hidden sm:flex flex-col items-center justify-center w-full h-full sm:w-[40%] lg:w-1/3 text-white">
-        Profile Box
+        <ProfileCard profileStatus="NotFilled" id={otherUser.id} />
       </div>
     </div>
   );

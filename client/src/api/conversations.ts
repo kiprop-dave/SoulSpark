@@ -5,7 +5,7 @@ import { api } from './base';
 
 import { PossibleError } from './matches';
 
-const errorHandler = (err: unknown): { status: 'error'; error: PossibleError } => {
+export const errorHandler = (err: unknown): { status: 'error'; error: PossibleError } => {
   if (err instanceof axios.AxiosError) {
     if (err.response?.status === 401) {
       return { status: 'error', error: 'unauthorized' };

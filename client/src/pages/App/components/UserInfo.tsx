@@ -4,7 +4,7 @@ type UserInfoProps = {
   personalInfo: PersonalInfo;
   basicInfo?: BasicInfo;
   otherInfo?: OtherInfo;
-  preferences: Preferences;
+  preferences?: Preferences;
 };
 
 export function UserInfo(props: UserInfoProps): JSX.Element {
@@ -16,10 +16,14 @@ export function UserInfo(props: UserInfoProps): JSX.Element {
         <NameAge first_name={personalInfo.first_name} dateOfBirth={personalInfo.dateOfBirth} />
         <p className="text-slate-600 tracking-wider dark:text-gray-300">{personalInfo.gender}</p>
       </div>
-      <div className="py-2 px-2 w-full border-b border-b-slate-300 dark:border-b-gray-700">
-        <h1 className="font-semibold dark:text-white">Looking for</h1>
-        <p className="text-slate-600 tracking-wider dark:text-gray-300">{preferences.lookingFor}</p>
-      </div>
+      {preferences?.lookingFor !== undefined && (
+        <div className="py-2 px-2 w-full border-b border-b-slate-300 dark:border-b-gray-700">
+          <h1 className="font-semibold dark:text-white">Looking for</h1>
+          <p className="text-slate-600 tracking-wider dark:text-gray-300">
+            {preferences.lookingFor}
+          </p>
+        </div>
+      )}
       {basicInfo?.languages?.length !== undefined && basicInfo?.languages?.length > 0 && (
         <div className="py-2 px-2 w-full border-b border-b-slate-300 dark:border-b-gray-700">
           <h1 className="font-semibold dark:text-white">Languages I know</h1>
