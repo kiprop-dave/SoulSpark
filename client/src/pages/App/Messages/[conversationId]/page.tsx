@@ -77,7 +77,7 @@ export default function ConversationPage(): JSX.Element {
             </div>
           )}
         </div>
-        <div className="h-[12%] md:h-[12%] w-full border-t border-slate-300 dark:border-gray-700">
+        <div className="h-[12%] md:h-[12%] w-full border-t border-slate-300 dark:border-gray-700 relative">
           <MessageInput conversationId={conversationId} />
         </div>
       </div>

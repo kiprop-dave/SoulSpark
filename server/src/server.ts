@@ -9,6 +9,7 @@ import usersRouter from './routes/users/users';
 import { matchesRouter } from './routes/matches/matches';
 import { likesRouter } from './routes/likes/route';
 import { conversationRouter } from './routes/conversations/route';
+import tenorRouter from './routes/tenor';
 import { env } from './lib/env';
 import { appConstants } from './utils/constants';
 
@@ -41,6 +42,7 @@ app.use('/users', usersRouter);
 app.use('/matches', matchesRouter);
 app.use('/likes', likesRouter);
 app.use('/conversations', conversationRouter);
+app.use('/tenor', tenorRouter);
 
 app.use('*', (_, res) => {
   return res.status(404).send('Not found');

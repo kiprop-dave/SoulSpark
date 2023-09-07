@@ -13,6 +13,10 @@ const envSchema = object({
   PUSHER_APP_ID: string(),
   PUSHER_KEY: string(),
   PUSHER_SECRET: string(),
+  CLOUDINARY_CLOUD_NAME: string(),
+  CLOUDINARY_API_KEY: string(),
+  CLOUDINARY_API_SECRET: string(),
+  TENOR_API_KEY: string(),
 });
 
 export const env = envSchema.parse(process.env);
