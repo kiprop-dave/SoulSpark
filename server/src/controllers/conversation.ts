@@ -69,6 +69,9 @@ export const getConversations = async (userId: string): Promise<GetConversations
           },
         },
       },
+      orderBy: {
+        updatedAt: 'desc',
+      },
     });
 
     const validated = conversations.reduce((acc: Conversation[], curr) => {
@@ -160,6 +163,7 @@ export const postMessage = async (
             },
           },
         },
+        updatedAt: new Date(),
       },
       include: {
         messages: {

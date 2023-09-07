@@ -32,6 +32,19 @@ export function ConversationsContextProvider({
     return user?.id;
   }, [user]);
 
+  const updateConversationWithOrder = (msg: MessagePosted) => {
+    setInitialConversations((prev) => {
+      let updatedConversation = prev.find((conv) => {
+        return conv.id === msg.conversationId;
+      });
+      if (!updatedConversation) return prev;
+      updatedConversation.messages = [msg, ...updatedConversation.messages];
+      const filteredConversations = prev.filter((conv) => conv.id !== msg.conversationId);
+      filteredConversations.unshift(updatedConversation);
+      return filteredConversations;
+    });
+  };
+
   useEffect(() => {
     setIsLoading(true);
     if (user) {
@@ -55,17 +68,7 @@ export function ConversationsContextProvider({
     };
 
     const newMessageHandler = (data: MessagePosted) => {
-      setInitialConversations((prev) => {
-        return prev.map((conversation) => {
-          if (conversation.id === data.conversationId) {
-            return {
-              ...conversation,
-              messages: [data, ...conversation.messages],
-            };
-          }
-          return conversation;
-        });
-      });
+      updateConversationWithOrder(data);
     };
 
     const deleteConversationHandler = (id: string) => {
@@ -91,17 +94,7 @@ export function ConversationsContextProvider({
     postMessage(user.accessToken, conversationId, message).then((res) => {
       //TODO:Create some form of optimistic update
       if (res.status === 'success') {
-        setInitialConversations((prev) => {
-          return prev.map((conversation) => {
-            if (conversation.id === conversationId) {
-              return {
-                ...conversation,
-                messages: [res.data, ...conversation.messages],
-              };
-            }
-            return conversation;
-          });
-        });
+        updateConversationWithOrder(res.data);
       }
     });
   };

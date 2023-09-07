@@ -80,13 +80,11 @@ conversationRouter.route('/profile/:id').get(async (req, res) => {
       return res.status(404).json({ error: 'Profile not found' });
     }
 
-    return res
-      .status(200)
-      .json({
-        personalInfo: profile.personalInfo,
-        basicInfo: profile.basicInfo,
-        otherInfo: profile.otherInfo,
-      });
+    return res.status(200).json({
+      personalInfo: profile.personalInfo,
+      basicInfo: profile.basicInfo,
+      otherInfo: profile.otherInfo,
+    });
   } catch (err) {
     console.error(err);
     return res.status(500).send('Internal Server Error');

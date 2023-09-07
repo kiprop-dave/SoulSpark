@@ -15,7 +15,7 @@ type GetUserLikesTeaserResult =
   | { status: 'error'; error: 'Unauthorized' | 'NetworkError' | 'UnknownError' };
 export const getUserLikesTeaser = async (token: string): Promise<GetUserLikesTeaserResult> => {
   try {
-    const res = await api.get('/likes', {
+    const res = await api.get('/likes/teaser', {
       headers: {
         Authorization: `Bearer ${token}`,
       },

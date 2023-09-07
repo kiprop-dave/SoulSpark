@@ -19,6 +19,17 @@ export function MessagesList({}: MessageListProps): JSX.Element {
     });
   }, [conversations]);
 
+  if (realConversations.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center w-full md:h-[92%]">
+        <p className="text-xl font-bold text-center text-gray-500">
+          No new messages yet. <br />
+          Keep swiping!
+        </p>
+      </div>
+    );
+  }
+
   return (
     <section className="h-[92%] overflow-y-scroll no-scrollbar p-2">
       <Link

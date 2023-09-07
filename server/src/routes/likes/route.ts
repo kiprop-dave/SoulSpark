@@ -7,7 +7,7 @@ const likesRouter = Router();
 likesRouter.use(verifyAccessTokenMiddleware);
 
 // This should return the number of users that like the user. Premium users can see the list of users that like them.
-likesRouter.route('/').get(async (req, res) => {
+likesRouter.route('/teaser').get(async (req, res) => {
   const session = await getSession(req);
   if (!session) {
     return res.status(401).send('Unauthorized');

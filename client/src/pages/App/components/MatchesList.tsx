@@ -11,6 +11,17 @@ export function MatchesList({}: MatchesListProps): JSX.Element {
   const { likesTeaser, loading } = useLikesTeaser();
   const { likes } = likesTeaser;
   const { matches } = useMatches();
+
+  if (likes === 0 && matches.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center w-full md:h-[92%]">
+        <p className="text-xl font-bold text-center text-gray-500">
+          No new matches yet. <br />
+          Keep swiping!
+        </p>
+      </div>
+    );
+  }
   return (
     <section className="flex gap-4 p-2 w-full overflow-scroll no-scrollbar md:grid md:grid-cols-2 lg:grid-cols-3 md:gap-3 lg:gap-6 md:h-[92%]">
       <Link

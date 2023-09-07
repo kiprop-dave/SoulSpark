@@ -69,7 +69,7 @@ function MessageContent({ message, otherUser }: MessageContentProps): JSX.Elemen
           onMouseLeave={() => setHovered(false)}
         >
           <div
-            className={clsx('p-2 w-full rounded-t-2xl cursor-default', {
+            className={clsx('p-2 max-w-[20rem] rounded-t-2xl cursor-default', {
               'ml-2 bg-gray-200 text-black rounded-br-2xl rounded-bl-sm dark:bg-neutral-700 dark:text-white':
                 message.senderId === otherUser.id,
               'bg-blue-500 rounded-bl-2xl rounded-br-sm': message.senderId !== otherUser.id,
