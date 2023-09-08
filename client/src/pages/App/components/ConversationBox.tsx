@@ -47,7 +47,12 @@ export default function ConversationBox({ conversation }: ConversationBoxProps):
         <div className="h-1/2 flex items-center overflow-hidden justify-between">
           <div className="w-5/6 h-full">
             <p className="text-slate-500 dark:text-gray-400 truncate">
-              {latestMessage.text !== undefined ? latestMessage.text : 'Sent an image'}
+              {latestMessage.senderId === user?.id ? 'You: ' : ''}
+              {!!latestMessage.text
+                ? latestMessage.text
+                : !!latestMessage.attachment
+                ? 'Sent an image'
+                : 'Sent a gif'}
             </p>
           </div>
           <div className="flex-1 h-full flex items-center justify-end pr-2">

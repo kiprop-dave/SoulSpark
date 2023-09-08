@@ -2,7 +2,11 @@ import { useEffect, useMemo, useState } from 'react';
 import { useGif } from '@/context/GifContext';
 import useDebounce from '@/hooks/useDebounce';
 
-export default function GifPicker(): JSX.Element {
+type GifPickerProps = {
+  onSelect: (url: string) => void;
+};
+
+export default function GifPicker({ onSelect }: GifPickerProps): JSX.Element {
   const { gifs, loadingGifs, setQueryGifs } = useGif();
   const [query, setQuery] = useState('');
   const debouncedQuery = useDebounce(query, 500);
@@ -34,6 +38,7 @@ export default function GifPicker(): JSX.Element {
               src={url}
               alt={gif.title}
               className="w-36 h-36 rounded-lg mr-2 cursor-pointer"
+              onClick={() => onSelect(url)}
             />
           );
         })}

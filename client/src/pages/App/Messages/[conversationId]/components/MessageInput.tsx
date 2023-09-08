@@ -44,6 +44,11 @@ export default function MessageInput({ conversationId }: MessageInputProps): JSX
     }
   };
 
+  const handlGiftSelect = (url: string) => {
+    sendMessage(conversationId, { format: 'gif', body: url });
+    setOpenAttachment('none');
+  };
+
   return (
     <GifProvider>
       <div className="w-full h-full flex flex-row items-center px-2 lg:px-4">
@@ -58,7 +63,7 @@ export default function MessageInput({ conversationId }: MessageInputProps): JSX
             {openAttachment === 'gallery' ? (
               <div>Gallery</div>
             ) : openAttachment === 'gif' ? (
-              <GifPicker />
+              <GifPicker onSelect={handlGiftSelect} />
             ) : openAttachment === 'emoji' ? (
               <div>Emoji</div>
             ) : null}

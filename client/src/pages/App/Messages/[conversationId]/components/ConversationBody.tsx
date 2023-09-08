@@ -59,7 +59,7 @@ function MessageContent({ message, otherUser }: MessageContentProps): JSX.Elemen
           <UserAvatar imageSrc={otherUser.images[0].secure_url} isBlurred={false} />
         </div>
       )}
-      {message.text !== undefined && (
+      {!!message.text && (
         <div
           className={clsx('max-w-[75%] lg:max-w-[55%] items-center', {
             'flex flex-row-reverse': message.senderId !== otherUser.id,
@@ -87,6 +87,21 @@ function MessageContent({ message, otherUser }: MessageContentProps): JSX.Elemen
               {format(message.createdAt, 'dd/MM/yyyy HH:mm')}
             </p>
           )}
+        </div>
+      )}
+      {(!!message.attachment || !!message.gifUrl) && (
+        <div className="w-40 h-40 rounded-xl">
+          <img
+            src={
+              !!message.attachment
+                ? message.attachment.secure_url
+                : !!message.gifUrl
+                ? message.gifUrl
+                : undefined
+            }
+            alt="attachment"
+            className="w-full h-full object-contain rounded-xl"
+          />
         </div>
       )}
     </>

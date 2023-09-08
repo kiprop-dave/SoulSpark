@@ -114,6 +114,8 @@ model Message {
 
   attachment DigitalAsset?
 
+  gifUrl String? @map("gif_url")
+
   Conversation   Conversation? @relation(fields: [conversationId], references: [id], onDelete: Cascade)
   conversationId String        @map("conversation_id")
 

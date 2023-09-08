@@ -28,10 +28,11 @@ export type User = z.infer<typeof userSchema>;
 export const messageSchema = z.object({
   id: z.string(),
   createdAt: z.coerce.date(),
-  text: z.string().optional(),
+  text: z.string().optional().nullable(),
   seenBy: z.array(z.string()),
   senderId: z.string(),
   attachment: imageSchema.optional().nullable(),
+  gifUrl: z.string().optional().nullable(),
 });
 export type Message = z.infer<typeof messageSchema>;
 
@@ -90,8 +91,12 @@ const postMessageInput = z.union([
     body: z.string(),
   }),
   z.object({
-    format: z.literal('media'),
+    format: z.literal('photo'),
     body: imageSchema,
+  }),
+  z.object({
+    format: z.literal('gif'),
+    body: z.string(),
   }),
 ]);
 export type PostMessageInput = z.infer<typeof postMessageInput>;

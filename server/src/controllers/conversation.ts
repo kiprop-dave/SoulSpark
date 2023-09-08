@@ -7,10 +7,11 @@ import { pusherServer } from '../lib/pusher';
 export const messageSchema = z.object({
   id: z.string(),
   createdAt: z.date(),
-  text: z.string().optional(),
+  text: z.string().optional().nullable(),
   seenBy: z.array(z.string()),
   senderId: z.string(),
   attachment: imageSchema.optional().nullable(),
+  gifUrl: z.string().optional().nullable(),
 });
 export type Message = z.infer<typeof messageSchema>;
 
@@ -83,6 +84,7 @@ export const getConversations = async (userId: string): Promise<GetConversations
           seenBy: curr.seenBy.map((user) => user.id),
           senderId: curr.senderId,
           attachment: curr.attachment,
+          gifUrl: curr.gifUrl,
         });
         if (m.success) {
           acc.push(m.data);
@@ -132,8 +134,12 @@ export const postMessageInput = z.union([
     body: z.string(),
   }),
   z.object({
-    format: z.literal('media'),
+    format: z.literal('photo'),
     body: imageSchema,
+  }),
+  z.object({
+    format: z.literal('gif'),
+    body: z.string(),
   }),
 ]);
 type PostMessageInput = z.infer<typeof postMessageInput>;
@@ -153,8 +159,9 @@ export const postMessage = async (
           create: {
             text: message.format === 'text' ? message.body : undefined,
             attachment: {
-              create: message.format === 'media' ? message.body : undefined,
+              create: message.format === 'photo' ? message.body : undefined,
             },
+            gifUrl: message.format === 'gif' ? message.body : undefined,
             senderId: userId,
             seenBy: {
               connect: {
@@ -192,6 +199,7 @@ export const postMessage = async (
       senderId: updatedConversation.messages[0].senderId,
       attachment: updatedConversation.messages[0].attachment,
       conversationId: updatedConversation.id,
+      gifUrl: updatedConversation.messages[0].gifUrl,
     });
 
     if (validated.success) {
