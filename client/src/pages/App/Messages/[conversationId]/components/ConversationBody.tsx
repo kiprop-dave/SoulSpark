@@ -51,6 +51,7 @@ type MessageContentProps = {
 };
 function MessageContent({ message, otherUser }: MessageContentProps): JSX.Element {
   const [hovered, setHovered] = useState(false);
+  //TODO: Add NSFW blur
 
   return (
     <>
@@ -90,7 +91,12 @@ function MessageContent({ message, otherUser }: MessageContentProps): JSX.Elemen
         </div>
       )}
       {(!!message.attachment || !!message.gifUrl) && (
-        <div className="w-40 h-40 rounded-xl">
+        <div
+          className={clsx('w-48 rounded-xl', {
+            'h-52': !!message.attachment,
+            'h-48': !!message.gifUrl,
+          })}
+        >
           <img
             src={
               !!message.attachment
@@ -100,7 +106,7 @@ function MessageContent({ message, otherUser }: MessageContentProps): JSX.Elemen
                 : undefined
             }
             alt="attachment"
-            className="w-full h-full object-contain rounded-xl"
+            className="w-full h-full object-cover rounded-xl"
           />
         </div>
       )}

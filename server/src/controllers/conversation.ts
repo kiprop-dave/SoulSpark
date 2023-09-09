@@ -210,7 +210,7 @@ export const postMessage = async (
     return { status: 'error', error: 'validation' };
   } catch (err) {
     const error = errorHandler(err);
-    console.log(error.type, error.message, 'error in postMessage');
+    console.log(err, error.type, error.message, 'error in postMessage');
     return { status: 'error', error: error.type };
   }
 };

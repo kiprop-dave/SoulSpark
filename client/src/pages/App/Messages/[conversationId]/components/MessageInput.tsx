@@ -6,6 +6,8 @@ import { MdOutlineEmojiEmotions } from 'react-icons/md';
 import { useConversations } from '@/context/ConversationsContext';
 import { GifProvider } from '@/context/GifContext';
 import GifPicker from './GifPicker';
+import ImagePickerGallery from './ImagePickerGallery';
+import { Image } from '@/types';
 
 type MessageInputProps = {
   conversationId: string;
@@ -49,19 +51,24 @@ export default function MessageInput({ conversationId }: MessageInputProps): JSX
     setOpenAttachment('none');
   };
 
+  const handleImageSelect = (image: Image) => {
+    sendMessage(conversationId, { format: 'photo', body: image });
+    setOpenAttachment('none');
+  };
+
   return (
     <GifProvider>
       <div className="w-full h-full flex flex-row items-center px-2 lg:px-4">
         {openAttachment === 'none' ? null : (
           <div
             className={clsx('absolute left-0 w-full', {
-              'top-[] h-[]': openAttachment === 'gallery',
+              'top-[-16rem] h-[-16rem]': openAttachment === 'gallery',
               'top-[-12rem] h-[12rem]': openAttachment === 'gif',
               'top-[-16px] h-[12px]': openAttachment === 'emoji',
             })}
           >
             {openAttachment === 'gallery' ? (
-              <div>Gallery</div>
+              <ImagePickerGallery onSelect={handleImageSelect} />
             ) : openAttachment === 'gif' ? (
               <GifPicker onSelect={handlGiftSelect} />
             ) : openAttachment === 'emoji' ? (

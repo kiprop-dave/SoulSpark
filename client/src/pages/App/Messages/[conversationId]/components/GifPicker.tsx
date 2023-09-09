@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useGif } from '@/context/GifContext';
 import useDebounce from '@/hooks/useDebounce';
+import Spinner from '@/components/Spinner';
 
 type GifPickerProps = {
   onSelect: (url: string) => void;
@@ -24,7 +25,11 @@ export default function GifPicker({ onSelect }: GifPickerProps): JSX.Element {
   }, [gifs, debouncedQuery]);
 
   if (loadingGifs) {
-    return <p>Loading...</p>;
+    return (
+      <div className="w-full h-full flex items-center justify-center">
+        <Spinner size="sm" />
+      </div>
+    );
   }
 
   return (

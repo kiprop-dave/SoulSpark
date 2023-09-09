@@ -24,7 +24,7 @@ export const useUserProfile = (input: useProfileInput) => {
         }
       });
     }
-  }, []);
+  }, [input]);
 
   return { profile };
 };

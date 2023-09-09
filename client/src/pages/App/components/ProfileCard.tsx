@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import clsx from 'clsx';
 import { useUserProfile } from '@/hooks/useUserProfile';
 import { useImagesCarousel } from '@/hooks/useImagesCarousel';
@@ -14,6 +15,10 @@ export default function ProfileCard(props: ProfileCardProps): JSX.Element {
   const { currentIndex, atStart, atEnd, nextImage, previousImage, resetIndex } = useImagesCarousel(
     profile.profile?.personalInfo.images.length || 0
   );
+
+  useEffect(() => {
+    resetIndex();
+  }, [props]);
 
   if (profile.status === 'ready') {
     return (
