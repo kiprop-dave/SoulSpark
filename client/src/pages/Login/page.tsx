@@ -4,7 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Button } from '@/components/ui/button';
 import { FaFacebookSquare, FaTwitterSquare, FaGoogle } from 'react-icons/fa';
 import { AiFillEyeInvisible, AiOutlineEye } from 'react-icons/ai';
-import { Navigate, useNavigate, useRouter } from '@tanstack/router';
+import { Navigate, useNavigate } from '@tanstack/router';
 import { loginWithCredentials, signupWithCredentials } from '@/api/user';
 import logo from '@/assets/logo.svg';
 import { appConstants } from '@/lib/constants';

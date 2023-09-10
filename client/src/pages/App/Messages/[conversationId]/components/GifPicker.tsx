@@ -8,7 +8,7 @@ type GifPickerProps = {
 };
 
 export default function GifPicker({ onSelect }: GifPickerProps): JSX.Element {
-  const { gifs, loadingGifs, setQueryGifs } = useGif();
+  const { gifs, gifStatus, setQueryGifs } = useGif();
   const [query, setQuery] = useState('');
   const debouncedQuery = useDebounce(query, 500);
 
@@ -24,10 +24,18 @@ export default function GifPicker({ onSelect }: GifPickerProps): JSX.Element {
     }
   }, [gifs, debouncedQuery]);
 
-  if (loadingGifs) {
+  if (gifStatus === 'loading') {
     return (
       <div className="w-full h-full flex items-center justify-center">
         <Spinner size="sm" />
+      </div>
+    );
+  }
+
+  if (gifStatus === 'error') {
+    return (
+      <div className="w-full h-full flex items-center justify-center">
+        <p className="text-red-500">Error loading GIFs</p>
       </div>
     );
   }
@@ -55,7 +63,6 @@ export default function GifPicker({ onSelect }: GifPickerProps): JSX.Element {
           className="w-full h-full px-2 py-1 rounded-lg bg-white dark:bg-neutral-800 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-red-500"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          disabled={loadingGifs}
         />
       </div>
     </div>

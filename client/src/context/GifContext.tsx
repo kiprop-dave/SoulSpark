@@ -2,25 +2,26 @@ import { createContext, useState, useEffect, useContext } from 'react';
 import { getTrendingGifs, Tenor, queryGifs } from '@/api/tenor';
 
 type GifContextType = {
-  loadingGifs: boolean;
+  gifStatus: 'loading' | 'success' | 'error';
   gifs: Record<string, Tenor>;
   setQueryGifs: (query: string) => void;
 };
 const GifContext = createContext<GifContextType | null>(null);
 
 export const GifProvider = ({ children }: { children: React.ReactNode }): JSX.Element => {
-  const [loadingGifs, setLoadingGifs] = useState(false);
+  const [gifStatus, setGifStatus] = useState<'loading' | 'success' | 'error'>('loading');
   const [gifs, setGifs] = useState<Record<string, Tenor>>({}); // Cache for quicker search results
 
   useEffect(() => {
     const fetchTrendingGifs = async () => {
-      setLoadingGifs(true);
+      setGifStatus('loading');
       const result = await getTrendingGifs();
       if (result.status === 'success') {
         setGifs((prev) => ({ ...prev, trending: result.data }));
+        setGifStatus('success');
+      } else {
+        setGifStatus('error');
       }
-      //TODO: Handle error
-      setLoadingGifs(false);
     };
     fetchTrendingGifs();
   }, []);
@@ -28,17 +29,19 @@ export const GifProvider = ({ children }: { children: React.ReactNode }): JSX.El
   const setQueryGifs = (query: string) => {
     if (query.length === 0) return;
     if (gifs[query]) return;
-    setLoadingGifs(true);
+    setGifStatus('loading');
     queryGifs(query).then((result) => {
       if (result.status === 'success') {
         setGifs((prev) => ({ ...prev, [query]: result.data }));
+        setGifStatus('success');
+      } else {
+        setGifStatus('error');
       }
-      setLoadingGifs(false);
     });
   };
 
   const value: GifContextType = {
-    loadingGifs,
+    gifStatus,
     gifs,
     setQueryGifs,
   };

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import clsx from 'clsx';
 import { useAppRoutes } from '@/hooks/useAppRoutes';
 import { MatchesList } from './MatchesList';
@@ -17,15 +17,23 @@ export function SidebarBody({}: SidebarBodyProps): JSX.Element {
       {location === '/profile' || location === '/settings' ? (
         <ProfileSettings />
       ) : (
-        <MatchesMessages />
+        <MatchesMessages location={location} />
       )}
     </div>
   );
 }
 
-interface MatchesMessagesProps {}
-function MatchesMessages({}: MatchesMessagesProps): JSX.Element {
+interface MatchesMessagesProps {
+  location: string;
+}
+function MatchesMessages({ location }: MatchesMessagesProps): JSX.Element {
   const [activeTab, setActiveTab] = useState<SidebarTab>('Matches');
+
+  useEffect(() => {
+    if (location.startsWith('/messages')) {
+      setActiveTab('Messages');
+    }
+  }, [location]);
 
   return (
     <>

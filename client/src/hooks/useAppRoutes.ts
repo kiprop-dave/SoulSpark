@@ -16,11 +16,11 @@ type Route = {
 // This hook is used to manage the state of the application's routes and makes them type safe
 export function useAppRoutes() {
   const [location, setLocation] = useState(() => {
-    return window.location.pathname.split('app')[1];
+    return window.location.pathname.split('app')[1] ?? '';
   });
 
   useEffect(() => {
-    const path = window.location.pathname.split('app')[1];
+    const path = window.location.pathname.split('app')[1] ?? '';
     if (path !== location) setLocation(path);
   }, [window.location.pathname]);
 

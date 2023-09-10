@@ -6,15 +6,20 @@ type AuthContextType = {
   user: LoggedInUser | null;
   setUserContext: (user: LoggedInUser | null) => void;
   logoutUser: () => void;
+  authenticating: boolean;
 };
 
 const AuthContext = createContext<AuthContextType | null>(null);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<LoggedInUser | null>(null);
+  const [authenticating, setAuthenticating] = useState<boolean>(true);
 
   useEffect(() => {
-    getLoggedInUser().then((user) => setUser(user));
+    setAuthenticating(true);
+    getLoggedInUser()
+      .then((user) => setUser(user))
+      .finally(() => setAuthenticating(false));
   }, []);
 
   const setUserContext = (user: LoggedInUser | null) => {
@@ -29,6 +34,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     user,
     setUserContext,
     logoutUser,
+    authenticating,
   };
 
   return <AuthContext.Provider value={contextValue}>{children}</AuthContext.Provider>;

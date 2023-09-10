@@ -64,6 +64,7 @@ function Match({ match }: MatchProps): JSX.Element {
       to="/app/messages/$conversationId"
       from="/app/messages"
       params={{ conversationId: to }}
+      preload="intent" // start loading when the user hovers over the link
       className="flex flex-col items-center justify-center w-12 h-32 rounded min-w-[5rem] md:w-auto transform transition-transform hover:scale-105"
     >
       <div

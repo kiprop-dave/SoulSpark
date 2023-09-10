@@ -11,11 +11,12 @@ import ConversationBody from './components/ConversationBody';
 import NoMessages from './components/NoMessages';
 import MessageInput from './components/MessageInput';
 import ProfileCard from '../../components/ProfileCard';
+import Spinner from '@/components/Spinner';
 
 export default function ConversationPage(): JSX.Element {
   const { user } = useAuth();
   const { location } = useAppRoutes();
-  const { conversations, markMessagesAsSeen } = useConversations();
+  const { conversations, markMessagesAsSeen, conversationsStatus } = useConversations();
   const conversationId = useMemo(() => location.split('/')[2], [location, conversations]);
 
   useEffect(() => {
@@ -23,6 +24,15 @@ export default function ConversationPage(): JSX.Element {
   }, [conversationId, conversations]);
 
   const conversation = conversations.find((c) => c.id === conversationId);
+
+  if (conversationsStatus === 'loading') {
+    return (
+      <div className="w-full h-full flex items-center justify-center bg-white dark:bg-neutral-800">
+        <Spinner size="xl" />
+      </div>
+    );
+  }
+
   if (!conversation) {
     return <Navigate to="/app/messages" replace />;
   }
@@ -52,7 +62,7 @@ export default function ConversationPage(): JSX.Element {
           </div>
         </div>
         <nav className="flex items-center w-full h-[8%] px-2 border-b border-slate-300 dark:border-gray-700 md:hidden">
-          <Link to="/app/messages" from="/app/messages/$conversationId">
+          <Link to="/app/messages" from="/app/messages/$conversationId" preload="intent">
             <IoChevronBack className="w-8 h-8 text-slate-700 dark:text-slate-300" />
           </Link>
           <div className="w-full h-full ml-4 flex items-center justify-center">

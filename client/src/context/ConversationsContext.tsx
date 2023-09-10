@@ -12,7 +12,7 @@ import { pusherClient } from '@/lib/pusher';
 
 type ConversationContextType = {
   conversations: Conversation[];
-  isLoading: boolean;
+  conversationsStatus: 'resolved' | 'loading' | 'error';
   sendMessage: (conversationId: string, message: PostMessageInput) => void;
   markMessagesAsSeen: (conversationId: string) => void;
 };
@@ -26,7 +26,9 @@ export function ConversationsContextProvider({
 }): JSX.Element {
   const { user } = useAuth();
   const [initialConversations, setInitialConversations] = useState<Conversation[]>([]);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [conversationsStatus, setConversationsStatus] = useState<'resolved' | 'loading' | 'error'>(
+    'loading'
+  );
 
   const channel = useMemo(() => {
     return user?.id;
@@ -46,12 +48,13 @@ export function ConversationsContextProvider({
   };
 
   useEffect(() => {
-    setIsLoading(true);
     if (user) {
       getConversations(user.accessToken).then((res) => {
         if (res.status === 'success') {
           setInitialConversations(res.data);
-          setIsLoading(false);
+          setConversationsStatus('resolved');
+        } else {
+          setConversationsStatus('error');
         }
       });
     }
@@ -130,7 +133,7 @@ export function ConversationsContextProvider({
 
   const values: ConversationContextType = {
     conversations: initialConversations,
-    isLoading,
+    conversationsStatus,
     sendMessage,
     markMessagesAsSeen,
   };
