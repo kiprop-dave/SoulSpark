@@ -4,12 +4,11 @@ import { Link } from '@tanstack/router';
 import { useLikesTeaser } from '@/context/LikesContext';
 import { useMatches } from '@/context/MatchesContext';
 import { Match as MatchType } from '@/types';
+import ImageComponent from '@/components/ImageComponent';
 
-interface MatchesListProps {}
-
-export function MatchesList({}: MatchesListProps): JSX.Element {
+export function MatchesList(): JSX.Element {
   const { likesTeaser, loading } = useLikesTeaser();
-  const { likes } = likesTeaser;
+  const { likes, latestLike } = likesTeaser;
   const { matches } = useMatches();
 
   if (likes === 0 && matches.length === 0) {
@@ -34,10 +33,13 @@ export function MatchesList({}: MatchesListProps): JSX.Element {
           }
         )}
       >
-        <div className="w-10 h-10 rounded-full flex items-center justify-center shadow-inner bg-orange-400">
+        <div className="absolute top-0 h-full w-full">
+          <ImageComponent imageSrc={latestLike.randomImage} isBlurred={true} />
+        </div>
+        <div className="w-10 h-10 rounded-full flex items-center justify-center shadow-inner bg-orange-400 z-50">
           <span className="text-xl font-bold">{likes}</span>
         </div>
-        <div className="absolute flex bottom-1 left-2">
+        <div className="absolute flex bottom-1 left-2 z-50">
           <p className="text-sm font-bold text-center text-white">
             {likes === 1 ? `${likes} Like` : `${likes} Likes`}
           </p>

@@ -17,6 +17,7 @@ const envSchema = object({
   CLOUDINARY_API_KEY: string(),
   CLOUDINARY_API_SECRET: string(),
   TENOR_API_KEY: string(),
+  EDEN_AI_API_KEY: string(),
 });
 
 export const env = envSchema.parse(process.env);

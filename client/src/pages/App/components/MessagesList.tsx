@@ -19,17 +19,6 @@ export function MessagesList({}: MessageListProps): JSX.Element {
     });
   }, [conversations]);
 
-  if (realConversations.length === 0) {
-    return (
-      <div className="flex flex-col items-center justify-center w-full md:h-[92%]">
-        <p className="text-xl font-bold text-center text-gray-500">
-          No new messages yet. <br />
-          Keep swiping!
-        </p>
-      </div>
-    );
-  }
-
   return (
     <section className="h-[92%] overflow-y-scroll no-scrollbar p-2">
       <Link
@@ -43,7 +32,7 @@ export function MessagesList({}: MessageListProps): JSX.Element {
         )}
       >
         <div className="w-14 h-14">
-          <UserAvatar isBlurred={true} />
+          <UserAvatar isBlurred={true} imageSrc={latestLike.randomImage} />
         </div>
         <div className="h-2/3">
           <h2 className="text-lg font-bold text-slate-900 dark:text-gray-100">
@@ -53,6 +42,14 @@ export function MessagesList({}: MessageListProps): JSX.Element {
           <p className="text-sm text-slate-500 dark:text-gray-400">Match Now!</p>
         </div>
       </Link>
+      {realConversations.length === 0 && (
+        <div className="flex flex-col items-center justify-center w-full md:h-[92%]">
+          <p className="text-xl font-bold text-center text-gray-500">
+            No new messages yet. <br />
+            Start a conversation with one of your matches or keep swiping!
+          </p>
+        </div>
+      )}
       {realConversations.map((conv, i) => {
         return (
           <div key={i} className="w-full border-b border-b-slate-300 h-16 dark:border-b-gray-700">

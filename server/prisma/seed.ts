@@ -81,7 +81,7 @@ const generateProfile = (user: RandomUser): GeneratedProfile => {
 
 const fetchRandomUsers = async (n: number): Promise<RandomUser[]> => {
   try {
-    const users = await fetch(`https://randomuser.me/api/?results=${n}`);
+    const users = await fetch(`https://randomuser.me/api/?results=${n}&password=upper,lower,8-10`);
     const data = await users.json();
     let validResults: RandomUser[] = [];
     data.results.forEach((user: any) => {
@@ -148,6 +148,7 @@ const saveImagesToDb = async (images: Image[]): Promise<string[]> => {
       if (result.status === 'fulfilled') {
         return result.value;
       } else {
+        console.log(result.reason)
         return null;
       }
     }).filter((id) => id !== null) as string[];
@@ -187,20 +188,6 @@ const fetchUnsplashImages = async (queries: string[]): Promise<string[]> => {
     }
     return acc;
   }, images);
-  // const destination = `https://api.unsplash.com/search/photos?query=${query}&per_page=40&orientation=portrait`;
-  // try {
-  //   const response = await fetch(destination, {
-  //     headers: {
-  //       Authorization: `Client-ID ${process.env.UNSPLASH_ACCESS_KEY}`
-  //     }
-  //   });
-  //   const data = await response.json();
-  //   const images = unsplashRespose.parse(data);
-  //   return images;
-  // } catch (err) {
-  //   console.error("error fetching images")
-  //   throw new Error('Error fetching images');
-  // }
 }
 
 const uploadImages = async (imagesUrls: string[]): Promise<Image[]> => {
@@ -225,11 +212,22 @@ const seedUsers = async () => {
   const usersCsv = createWriteStream('./users.csv');
   usersCsv.write("email,password\n");
   try {
-    const images = await fetchUnsplashImages(["black women", "asian men", "white women", "black men", "white men", "asian women"])
+    const queries = [
+      "white women",
+      "asian men",
+      "black women", "indian men", "indian women",
+      "black men",
+      "white men",
+      "asian women",
+      "european women",
+      "european men", "middle eastern men", "middle eastern women"
+    ]
+    const images = await fetchUnsplashImages(queries)
     const imagesUploaded = await uploadImages(images);
     const savedImages = await saveImagesToDb(imagesUploaded);
     const len = savedImages.length;
-    const users = await fetchRandomUsers(40);
+    console.log(`Images uploaded: ${len}`);
+    const users = await fetchRandomUsers(120);
     const imagesPerUser = Math.floor(len / users.length);
     if (imagesPerUser < 1) {
       console.log("Images not uploaded");
@@ -254,8 +252,47 @@ const seedUsers = async () => {
   }
 }
 
-seedUsers().then(async () => {
-  await client.$disconnect();
+// seedUsers().then(async () => {
+//   await client.$disconnect();
+// }).finally(async () => {
+//   await client.$disconnect();
+// });
+const likesSeed = async () => {
+  try {
+    const allUsers = await client.user.findMany({
+      select: {
+        email: true,
+        id: true
+      }
+    })
+    const me = allUsers.find((user) => user.email === "");
+    if (!me) {
+      return;
+    }
+    await Promise.allSettled(allUsers.map(async (user) => {
+      if (user.email === me.email) {
+        return;
+      } else {
+        await client.user.update({
+          where: {
+            email: user.email
+          },
+          data: {
+            likes: {
+              connect: {
+                id: me.id
+              }
+            }
+          }
+        })
+      }
+    }))
+  } catch (err) {
+    console.log(err);
+  }
+}
+likesSeed().then(() => {
+  console.log("done");
 }).finally(async () => {
   await client.$disconnect();
 });

@@ -133,6 +133,8 @@ model DigitalAsset {
   url           String   @db.VarChar(255)
   secure_url    String   @db.VarChar(255)
 
+  isSafeForWork Boolean @default(true) @map("is_safe_for_work")
+
   profileId String?  @map("profile_id")
   profile   Profile? @relation(fields: [profileId], references: [id], onDelete: Cascade)
 

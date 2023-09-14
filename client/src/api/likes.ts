@@ -5,6 +5,7 @@ const likesTeaserResponseSchema = z.object({
   likes: z.number(),
   latestLike: z.object({
     first_name: z.string(),
+    randomImage: z.string(),
   }),
 });
 

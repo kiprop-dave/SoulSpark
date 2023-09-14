@@ -14,6 +14,7 @@ export function LikesTeaserProvider({ children }: { children: React.ReactNode })
     likes: 0,
     latestLike: {
       first_name: '',
+      randomImage: '',
     },
   });
   const [loading, setLoading] = useState<boolean>(true);

@@ -79,14 +79,13 @@ export async function createUserProfile(
   id: string,
   profile: UserProfile
 ): Promise<UserProfile | null> {
-  console.log(profile);
   try {
     const { data } = await api.post(`users/profile/${id}`, profile, {
       headers: {
         Authorization: `Bearer ${accessToken}`,
       },
     });
-
+    // A bug here,TODO: fix it, the shape of data different on the server side
     const user = userProfileSchema.parse(data);
 
     return user;

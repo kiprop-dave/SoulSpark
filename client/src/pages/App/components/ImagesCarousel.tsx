@@ -78,6 +78,7 @@ function ImageView({ src }: { src: string }): JSX.Element {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    // Bug:Stuck on loading state sometimes
     setLoading(true);
     setImageSrc(src);
   }, [src]);
