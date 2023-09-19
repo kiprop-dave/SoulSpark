@@ -62,7 +62,7 @@ export async function createAcccount(userInfo: UserInfo, provider: 'Google' | 'F
       },
     });
     if (exists) {
-      return { id: exists.user.id, email: exists.user.email };
+      return { id: exists.user.id, email: exists.user.email, accountType: exists.user.accountType };
     }
     const newUser = await prisma.user.create({
       data: {
@@ -76,7 +76,7 @@ export async function createAcccount(userInfo: UserInfo, provider: 'Google' | 'F
         },
       },
     });
-    return { id: newUser.id, email: newUser.email };
+    return { id: newUser.id, email: newUser.email, accountType: newUser.accountType };
   } catch (err) {
     console.log(err);
     throw new Error('Error creating user');

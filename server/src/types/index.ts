@@ -4,6 +4,7 @@ export const sessionDataSchema = z.object({
   id: z.string(),
   email: z.string(),
   refreshToken: z.string(),
+  accountType: z.union([z.literal('Premium'), z.literal('Free')]),
 });
 
 export type SessionData = z.infer<typeof sessionDataSchema>;

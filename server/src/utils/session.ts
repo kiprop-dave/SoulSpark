@@ -11,7 +11,7 @@ import { Request, Response } from 'express';
 // this function will create a session for a user by storing their session data in redis
 // and setting a refresh token cookie on the client and saves a copy of the refresh token in redis. This
 // is done when the user first logs in.
-type UserSessionData = Pick<User, 'id' | 'email'>;
+type UserSessionData = Pick<User, 'id' | 'email' | 'accountType'>;
 
 export async function createSession(res: Response, user: UserSessionData): Promise<SessionData> {
   try {
@@ -20,6 +20,7 @@ export async function createSession(res: Response, user: UserSessionData): Promi
       id: user.id,
       email: user.email,
       refreshToken,
+      accountType: user.accountType,
     };
     await redis.set(`session:${user.id}`, JSON.stringify(sessionData), { EX: 60 * 60 * 24 * 7 });
     res.cookie('refreshToken', refreshToken, {

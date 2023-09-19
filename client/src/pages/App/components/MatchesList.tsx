@@ -27,13 +27,13 @@ export function MatchesList(): JSX.Element {
         to="/app/likes"
         from="/app/messages"
         className={clsx(
-          'flex items-center justify-center p-1 ring ring-orange-400 h-32 rounded relative min-w-[6rem] md:w-auto',
+          'flex items-center justify-center p-1 ring ring-orange-400 h-32 rounded relative min-w-[6rem] md:w-auto hover:scale-105',
           {
             hidden: loading || likes === 0,
           }
         )}
       >
-        <div className="absolute top-0 h-full w-full">
+        <div className="absolute top-0 h-full w-full rounded">
           <ImageComponent imageSrc={latestLike.randomImage} isBlurred={true} />
         </div>
         <div className="w-10 h-10 rounded-full flex items-center justify-center shadow-inner bg-orange-400 z-50">

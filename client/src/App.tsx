@@ -87,7 +87,6 @@ const matchesRoute = new Route({
   component: () => {
     return (
       <>
-        <MobileHeader />
         <LikesPage />
       </>
     );

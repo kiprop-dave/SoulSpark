@@ -9,7 +9,7 @@ import {
   matchSchema,
 } from '@/types';
 
-export type PossibleError = 'unauthorized' | 'serverError' | 'unknownError';
+export type PossibleError = 'unauthorized' | 'serverError' | 'unknownError' | 'validationError';
 type getPossibleMatchesResult =
   | { status: 'success'; data: PossibleMatch[] }
   | { status: 'error'; error: PossibleError };

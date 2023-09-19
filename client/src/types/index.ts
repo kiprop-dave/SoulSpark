@@ -1,10 +1,12 @@
 import z from 'zod';
 
+const accountTypeSchema = z.union([z.literal('Premium'), z.literal('Free')]);
 export const loggedInUserSchema = z.object({
   id: z.string(),
   email: z.string().email(),
   accessToken: z.string(),
   filledProfile: z.boolean(),
+  accountType: accountTypeSchema,
 });
 
 export type LoggedInUser = z.infer<typeof loggedInUserSchema>;

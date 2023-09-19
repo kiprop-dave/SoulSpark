@@ -23,6 +23,7 @@ authRouter.route('/me').get(async (req, res) => {
     email: session.email,
     filledProfile: filledProfile,
     accessToken,
+    accountType: session.accountType,
   });
 });
 
@@ -74,7 +75,11 @@ authRouter.route('/login').post(async (req, res) => {
       return res.status(401).send({ message: 'Incorrect email or password.' });
     }
 
-    const session = await createSession(res, { id: user.user.id, email: user.user.email });
+    const session = await createSession(res, {
+      id: user.user.id,
+      email: user.user.email,
+      accountType: user.user.accountType,
+    });
 
     const accessToken = generateAccessToken(session.id, '15m');
     const filledProfile = await checkUserProfile(session.id);
@@ -84,6 +89,7 @@ authRouter.route('/login').post(async (req, res) => {
       email: session.email,
       filledProfile: filledProfile,
       accessToken,
+      accountType: session.accountType,
     });
   } catch (err) {
     if (err instanceof ZodError) {

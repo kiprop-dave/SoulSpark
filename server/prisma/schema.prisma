@@ -11,11 +11,12 @@ datasource db {
 }
 
 model User {
-  id            String   @id @default(uuid())
-  email         String   @unique
-  emailVerified Boolean  @default(false) @map("email_verified")
-  password      String?  @db.VarChar(255)
-  createdAt     DateTime @default(now()) @map("created_at")
+  id            String          @id @default(uuid())
+  email         String          @unique
+  emailVerified Boolean         @default(false) @map("email_verified")
+  password      String?         @db.VarChar(255)
+  createdAt     DateTime        @default(now()) @map("created_at")
+  accountType   UserAccountType @default(Free) @map("account_type")
 
   // A user can like many users and be liked by many users
   // When two users like each other, they are matched and can start a conversation
@@ -36,6 +37,11 @@ model User {
   seenMessages Message[] @relation("seenBy")
 
   @@map("users")
+}
+
+enum UserAccountType {
+  Premium
+  Free
 }
 
 model Account {

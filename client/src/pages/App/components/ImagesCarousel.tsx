@@ -74,13 +74,15 @@ export function ImagesCarousel({
 }
 
 function ImageView({ src }: { src: string }): JSX.Element {
-  const [imageSrc, setImageSrc] = useState(src);
+  const [imageSrc, setImageSrc] = useState(
+    src.split('upload/').join('upload/w_500,f_auto,q_auto/')
+  );
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     // Bug:Stuck on loading state sometimes
     setLoading(true);
-    setImageSrc(src);
+    setImageSrc(src.split('upload/').join('upload/w_500,f_auto,q_auto/'));
   }, [src]);
 
   return (

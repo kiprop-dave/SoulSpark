@@ -79,6 +79,7 @@ export default function OtherDetailsTab({
       'Technology',
       'Traveling',
       'Writing',
+      'Anime',
     ],
     []
   );

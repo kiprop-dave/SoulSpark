@@ -11,6 +11,8 @@ export const errorHandler = (err: unknown): { status: 'error'; error: PossibleEr
       return { status: 'error', error: 'unauthorized' };
     }
     return { status: 'error', error: 'serverError' };
+  } else if (err instanceof z.ZodError) {
+    return { status: 'error', error: 'validationError' };
   } else {
     return { status: 'error', error: 'unknownError' };
   }

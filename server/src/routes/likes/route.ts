@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { verifyAccessTokenMiddleware } from '../../middleware/verifyAccessToken';
 import { getSession } from '../../utils/session';
-import { getLikesTeaser } from '../../controllers/likes';
+import { getFreeLikes, getLikesTeaser, getPremiumLikes } from '../../controllers/likes';
 
 const likesRouter = Router();
 likesRouter.use(verifyAccessTokenMiddleware);
@@ -18,6 +18,46 @@ likesRouter.route('/teaser').get(async (req, res) => {
   }
   const { likes, latestLike } = result.data;
   return res.status(200).json({ likes, latestLike });
+});
+
+likesRouter.route('/premium').get(async (req, res) => {
+  try {
+    const session = await getSession(req);
+    if (!session) {
+      return res.status(401).send('Unauthorized');
+    }
+    if (session.accountType !== 'Premium') {
+      return res.status(403).send('Forbidden');
+    }
+    const result = await getPremiumLikes(session.id);
+    if (result.status === 'error') {
+      return res.status(500).send('Internal Server Error');
+    }
+    return res.status(200).json(result.data);
+  } catch (err) {
+    console.error(err, 'error in /likes/premium');
+    return res.status(500).send('Internal Server Error');
+  }
+});
+
+likesRouter.route('/free').get(async (req, res) => {
+  try {
+    const session = await getSession(req);
+    if (!session) {
+      return res.status(401).send('Unauthorized');
+    }
+    const n = req.query.n;
+    if (!n || typeof n !== 'string') return res.status(400).send('Bad Request');
+
+    const result = await getFreeLikes(session.id, Number(n));
+    if (result.status === 'error') {
+      return res.status(500).send('Internal Server Error');
+    }
+    return res.status(200).json(result.data);
+  } catch (err) {
+    console.error(err, 'error in /likes/free');
+    return res.status(500).send('Internal Server Error');
+  }
 });
 
 export { likesRouter };
