@@ -133,7 +133,7 @@ export function Swipe({}: SwipeProps): JSX.Element {
   return (
     <>
       <div
-        className="w-full h-full flex flex-col items-center md:pt-1"
+        className="w-full h-full flex flex-col items-center md:pt-1 focus:outline-none"
         onKeyDown={handleKeyPress}
         tabIndex={0}
         ref={swipeRef}

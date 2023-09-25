@@ -4,7 +4,7 @@ import { apiBaseUrl } from './constants';
 // This allows the request to be sent with the cookies
 //@ts-ignore
 PusherClient.Runtime.createXHR = function () {
-  var xhr = new XMLHttpRequest();
+  const xhr = new XMLHttpRequest();
   xhr.withCredentials = true;
   return xhr;
 };

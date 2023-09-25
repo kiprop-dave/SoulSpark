@@ -15,7 +15,7 @@ import { appConstants } from './utils/constants';
 
 const app = express();
 
-const allowedOrigins = [appConstants.CLIENT_URL];
+const allowedOrigins = [appConstants.CLIENT_URL, 'http://localhost:4173'];
 app.use(
   cors({
     origin: (origin, cb) => {

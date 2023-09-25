@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import clsx from 'clsx';
+//import clsx from 'clsx';
 import { useUserProfile } from '@/hooks/useUserProfile';
 import { useImagesCarousel } from '@/hooks/useImagesCarousel';
 import { Profile } from '@/api/profile';

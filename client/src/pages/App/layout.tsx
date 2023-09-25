@@ -6,7 +6,7 @@ import { ConversationsContextProvider } from '@/context/ConversationsContext';
 import { SideBarHeader } from './components/SidebarHeader';
 import { SidebarBody } from './components/SidebarBody';
 
-export function AppPageLayout({ children }: { children: React.ReactNode }): JSX.Element {
+export default function AppPageLayout({ children }: { children: React.ReactNode }): JSX.Element {
   const { userProfile } = useUserProfile();
 
   return (

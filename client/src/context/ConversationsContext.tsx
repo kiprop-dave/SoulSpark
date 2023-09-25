@@ -36,7 +36,7 @@ export function ConversationsContextProvider({
 
   const updateConversationWithOrder = (msg: MessagePosted) => {
     setInitialConversations((prev) => {
-      let updatedConversation = prev.find((conv) => {
+      const updatedConversation = prev.find((conv) => {
         return conv.id === msg.conversationId;
       });
       if (!updatedConversation) return prev;

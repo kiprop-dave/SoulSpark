@@ -99,9 +99,9 @@ function MessageContent({ message, otherUser }: MessageContentProps): JSX.Elemen
         >
           <img
             src={
-              !!message.attachment
+              message.attachment
                 ? message.attachment.secure_url
-                : !!message.gifUrl
+                : message.gifUrl
                 ? message.gifUrl
                 : undefined
             }

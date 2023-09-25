@@ -1,18 +1,20 @@
+import { Suspense, lazy } from 'react';
 import { Outlet, RouterProvider, RootRoute, Route, Router } from '@tanstack/router';
 import { AuthProvider } from './context/AuthContext';
 import { UserProfileProvider } from './context/UserProfileContext';
 import { ThemeProvider, useTheme } from './context/ThemeContext';
 import { PossibleMatchesProvider } from './context/PossibleMatchesContext';
+import Spinner from './components/Spinner';
 import LoginPage from './pages/Login/page';
-import FillProfilePage from './pages/FillProfile/page';
-import { AppPageLayout } from './pages/App/layout';
-import AppPage from './pages/App/page';
-import ProfilePage from './pages/App/Profile/page';
-import LikesPage from './pages/App/Likes/page';
-import { MessagesPage } from './pages/App/Messages/page';
-import ConversationPage from './pages/App/Messages/[conversationId]/page';
+import AppPageLayout from './pages/App/layout';
 import AuthWrapper from './components/wrappers/AuthWrapper';
 import MobileHeader from './components/MobileHeader';
+const FillProfilePage = lazy(() => import('./pages/FillProfile/page'));
+const AppPage = lazy(() => import('./pages/App/page'));
+const ProfilePage = lazy(() => import('./pages/App/Profile/page'));
+const LikesPage = lazy(() => import('./pages/App/Likes/page'));
+const MessagesPage = lazy(() => import('./pages/App/Messages/page'));
+const ConversationPage = lazy(() => import('./pages/App/Messages/[conversationId]/page'));
 
 const rootRoute = new RootRoute({
   component: () => {
@@ -36,7 +38,13 @@ const loginRoute = new Route({
 const fillProfileRoute = new Route({
   getParentRoute: () => rootRoute,
   path: '/edit-profile',
-  component: FillProfilePage,
+  component: () => {
+    return (
+      <Suspense fallback={<Spinner size="md" />}>
+        <FillProfilePage />
+      </Suspense>
+    );
+  },
 });
 
 const appRoute = new Route({
@@ -62,7 +70,9 @@ const appIndexRoute = new Route({
     return (
       <>
         <MobileHeader />
-        <AppPage />
+        <Suspense fallback={<Spinner size="md" />}>
+          <AppPage />
+        </Suspense>
       </>
     );
   },
@@ -75,20 +85,22 @@ const profileRoute = new Route({
     return (
       <>
         <MobileHeader />
-        <ProfilePage />
+        <Suspense fallback={<Spinner size="md" />}>
+          <ProfilePage />
+        </Suspense>
       </>
     );
   },
 });
 
-const matchesRoute = new Route({
+const likesRoute = new Route({
   getParentRoute: () => appRoute,
   path: '/likes',
   component: () => {
     return (
-      <>
+      <Suspense fallback={<Spinner size="md" />}>
         <LikesPage />
-      </>
+      </Suspense>
     );
   },
 });
@@ -110,10 +122,12 @@ const messagesRoute = new Route({
   path: '/',
   component: () => {
     return (
-      <div className="w-full h-full">
+      <>
         <MobileHeader />
-        <MessagesPage />
-      </div>
+        <Suspense fallback={<Spinner size="md" />}>
+          <MessagesPage />
+        </Suspense>
+      </>
     );
   },
 });
@@ -121,12 +135,18 @@ const messagesRoute = new Route({
 const conversationRoute = new Route({
   getParentRoute: () => messagesIndexRoute,
   path: '$conversationId',
-  component: ConversationPage,
+  component: () => {
+    return (
+      <Suspense fallback={<Spinner size="md" />}>
+        <ConversationPage />
+      </Suspense>
+    );
+  },
 });
 
 const appRouteTree = appRoute.addChildren([
   appIndexRoute,
-  matchesRoute,
+  likesRoute,
   messagesIndexRoute.addChildren([messagesRoute, conversationRoute]),
   profileRoute,
 ]);

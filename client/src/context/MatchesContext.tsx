@@ -35,9 +35,9 @@ export function MatchesProvider({ children }: { children: React.ReactNode }) {
   };
 
   // Used to remove a match from the list of matches. This happens when the user starts a new conversation with the match.
-  const removeMatch = (matchId: string) => {
-    setMatches((prevMatches) => prevMatches.filter((match) => match.userId !== matchId));
-  };
+  // const removeMatch = (matchId: string) => {
+  //   setMatches((prevMatches) => prevMatches.filter((match) => match.userId !== matchId));
+  // };
 
   useEffect(() => {
     if (user) {

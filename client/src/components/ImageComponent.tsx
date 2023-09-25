@@ -15,6 +15,9 @@ export default function ImageComponent({
 }: ImageComponentProps): JSX.Element {
   const [loading, setLoading] = useState(true);
   const src = useMemo(() => {
+    if (isBlurred) {
+      return imageSrc.split('upload/').join('upload/w_10,h_10,f_auto,q_auto/');
+    }
     return imageSrc.split('upload/').join('upload/w_500,f_auto,q_auto/');
   }, [imageSrc]);
 
@@ -60,7 +63,7 @@ export default function ImageComponent({
           onLoad={() => setLoading(false)}
         />
         <div
-          className={clsx('absolute w-full h-full z-50 top-0 rounded', {
+          className={clsx('absolute w-full h-full z-50 top-0', {
             'backdrop-filter backdrop-blur-md': isBlurred,
             [roundedCn]: roundedCn,
           })}

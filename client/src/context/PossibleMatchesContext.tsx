@@ -22,14 +22,15 @@ export const PossibleMatchesProvider = ({
   const { user } = useAuth();
   const [possibleMatches, setPossibleMatches] = useState<PossibleMatch[]>([]);
   const [index, setIndex] = useState<number>(0);
-  const [isMatch, setIsMatch] = useState<boolean>(false);
+  const [_, setIsMatch] = useState<boolean>(false);
 
   // TODO:Add a way to reset the index and array of possible matches
   useEffect(() => {
     if (possibleMatches.length - index <= 3) {
       // The user is running out of possible matches, so we need to fetch more. This is done in the background before the user reaches the end of the list
       // User is guaranteed to be defined here since this context is called as a child of AuthContext
-      getPossibleMatches(user?.accessToken!).then((matches) => {
+      if (!user) return;
+      getPossibleMatches(user.accessToken).then((matches) => {
         if (matches.status === 'success') {
           setPossibleMatches((prev) => [...prev, ...matches.data]);
         }
@@ -42,9 +43,10 @@ export const PossibleMatchesProvider = ({
   const atEnd = possibleMatches.length === index;
 
   const next = (action: UserAction) => {
+    if (!user) return;
     if (action.action === 'like') {
       // Send a request to the server to like the user
-      likeMatch(user?.accessToken!, action.userId).then((result) => {
+      likeMatch(user.accessToken, action.userId).then((result) => {
         if (result.status === 'success') {
           setIsMatch(result.data.isMatch);
         }

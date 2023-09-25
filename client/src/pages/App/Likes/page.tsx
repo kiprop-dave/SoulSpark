@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState, useRef } from 'react';
 import { Link } from '@tanstack/router';
-import clsx from 'clsx';
+//import clsx from 'clsx';
 import { AiFillHeart } from 'react-icons/ai';
 import { ImCross } from 'react-icons/im';
 import { BsFilter } from 'react-icons/bs';
@@ -21,7 +21,7 @@ export default function LikesPage(): JSX.Element {
     loading,
   } = useLikesTeaser();
   const { user } = useAuth();
-  const [filterModalOpen, setFilterModalOpen] = useState(false);
+  const [_, setFilterModalOpen] = useState(false);
   const [likesProfiles, setLikesProfiles] = useState<LikesProfile>({
     accountType: 'Free',
     images: [],
@@ -77,12 +77,12 @@ export default function LikesPage(): JSX.Element {
     return [];
   }, [likesProfiles]);
 
-  const premiumProfiles = useMemo(() => {
-    if (likesProfiles.accountType === 'Premium') {
-      return likesProfiles.likes;
-    }
-    return [];
-  }, [likesProfiles]);
+  // const premiumProfiles = useMemo(() => {
+  //   if (likesProfiles.accountType === 'Premium') {
+  //     return likesProfiles.likes;
+  //   }
+  //   return [];
+  // }, [likesProfiles]);
 
   const passionFilters = useMemo(() => ['Anime', 'Movies & TV', 'Gaming', 'Sports', 'Music'], []);
 

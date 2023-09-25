@@ -18,7 +18,8 @@ export const useUserProfile = (input: useProfileInput) => {
     if (input.profileStatus === 'filled') {
       setProfile({ status: 'ready', profile: input.profile });
     } else {
-      getProfile(user?.accessToken!, input.id).then((result) => {
+      if (!user) return;
+      getProfile(user.accessToken, input.id).then((result) => {
         if (result.status === 'success') {
           setProfile({ status: 'ready', profile: result.data });
         }

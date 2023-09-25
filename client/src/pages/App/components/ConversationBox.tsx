@@ -48,9 +48,9 @@ export default function ConversationBox({ conversation }: ConversationBoxProps):
           <div className="w-5/6 h-full">
             <p className="text-slate-500 dark:text-gray-400 truncate">
               {latestMessage.senderId === user?.id ? 'You: ' : ''}
-              {!!latestMessage.text
+              {latestMessage.text
                 ? latestMessage.text
-                : !!latestMessage.attachment
+                : latestMessage.attachment
                 ? 'Sent an image'
                 : 'Sent a gif'}
             </p>

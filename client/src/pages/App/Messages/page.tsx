@@ -2,7 +2,7 @@ import { MatchesList } from '../components/MatchesList';
 import { MessagesList } from '../components/MessagesList';
 import { Swipe } from '../components/Swipe';
 
-export function MessagesPage(): JSX.Element {
+export default function MessagesPage(): JSX.Element {
   return (
     <>
       <div className="md:hidden w-full h-full overflow-scroll no-scrollbar">
