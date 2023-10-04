@@ -40,3 +40,13 @@ SoulSpark is tinder-inspired online dating web application designed to bring peo
 - **[TODO]** Free and Premium User Accounts with Additional Features.
 - **[TODO]** NSFW content detection.
 - **[TODO]** Update profile feature.
+
+## Screenshots
+
+![Login page](./screenshots/login.png)
+
+![swipe page](./screenshots/swipe.png)
+
+![send text](./screenshots/send-text.png)
+
+![send gif](./screenshots/send-gif.png)
